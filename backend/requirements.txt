@@ -1,0 +1,57 @@
+# PRAMAAN — pinned to versions verified working on Python 3.14.6 / macOS arm64, 2026-08-24.
+# With no container, this file is the only thing keeping laptops in sync.
+# Regenerate with:  .venv/bin/pip freeze
+#
+# NATIVE DEPENDENCIES (not installable by pip — see scripts/setup.sh):
+#   postgresql@16+     required
+#   tesseract          OPTIONAL - OCR path for scanned pages (F1)
+#   libomp             required by lightgbm only (Phase 7):  brew install libomp
+
+
+# --- API ---
+fastapi==0.141.1
+uvicorn==0.52.4
+email-validator==2.3.0
+pydantic==2.13.4
+pydantic-settings==2.15.0
+python-multipart==0.0.32
+
+# --- DB ---
+SQLAlchemy==2.0.52
+alembic==1.19.1
+psycopg==3.3.4
+psycopg-binary==3.3.4
+
+# --- Auth ---
+PyJWT==2.13.0
+bcrypt==5.0.0
+
+# --- PDF parsing (Phase 2) ---
+PyMuPDF==1.28.2
+pdfplumber==0.11.10
+pillow==12.3.0
+pytesseract==0.3.13
+
+# --- Extraction (Phase 3) ---
+rapidfuzz==3.14.5
+# The LLM SDK — Google's unified GenAI SDK. Only api/app/llm/provider.py imports it
+# (invariant #5), which is what keeps a provider swap to a one-file change rather than a
+# hunt through the codebase.
+google-genai==2.21.0
+
+# --- Assessment (Phase 4) ---
+PyYAML==6.0.3
+numpy==2.5.2
+numpy-financial==1.0.0
+
+# --- ML (Phases 7-8) ---
+pandas==3.0.5
+scikit-learn==1.9.0
+shap==0.52.0
+joblib==1.5.3
+lightgbm==4.7.0
+
+# --- Samples / tests ---
+reportlab==5.0.1
+pytest==9.1.1
+httpx==0.28.1
