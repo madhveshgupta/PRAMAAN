@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/60 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)];
+  }
+  .glass-panel-dark {
+    @apply bg-[#082a44]/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+  }
+  .text-glow {
+    text-shadow: 0 0 24px rgba(255,255,255,0.4);
+  }
+  .text-glow-gold {
+    text-shadow: 0 0 32px rgba(245, 185, 33, 0.4);
+  }
+  .animate-border-spin {
+    animation: border-spin 4s linear infinite;
+  }
+}
+
+@keyframes border-spin {
+  100% { transform: rotate(360deg); }
+}
+
+:root {
+  color-scheme: light;
+  /* Government sites are read on old monitors at 125% zoom. Type stays large, contrast
+     stays high, and nothing depends on colour alone to carry meaning.
+
+     ONE radius vocabulary (see tailwind.config.ts). The app used to sit at 3px while the
+     landing page sat at 12–16px; softening the app was the cheaper reconciliation because
+     the landing page's shape is what people meet first. */
+  --radius: 10px;
+  --radius-card: 14px;
+  --radius-rail: 18px;
+
+  /* The signed-in chrome. `--chrome-h` is what the evidence workspace sizes its split
+     against, and it is the one number in the layout that rots silently: too low and the
+     product's main screen grows a second scrollbar. Declared once, consumed everywhere. */
+  --topbar-h: 4.5rem;
+  --chrome-h: var(--topbar-h);
+  --sidebar-w: 16.5rem;
+
+  /* Driven by GSAP during the evidence snap. Declared here so the layout is correct on
+     first paint and with JavaScript disabled — the split simply never opens. */
+  --split-left: 100%;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  @apply bg-paper-soft text-ink antialiased;
+  font-feature-settings: "tnum" 1, "cv05" 1;   /* tabular figures — money must line up */
+}
+
+/* Safari draws its own disclosure triangle, which `list-none` does not remove — the FAQ
+   supplies its own chevron and would otherwise show two. */
+summary::-webkit-details-marker { display: none; }
+
+/* Focus that is actually visible. Keyboard users in a government office are common. */
+*:focus-visible {
+  outline: 2px solid theme("colors.brand.DEFAULT");
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* A quieter scrollbar for the long rails and the findings column. The default macOS
+   overlay bar is fine; this is for the Windows machines these screens actually run on,
+   where a 17px grey trench beside every panel is most of the visual noise on the page. */
+@supports (scrollbar-width: thin) {
+  .scroll-slim { scrollbar-width: thin; scrollbar-color: #cdd7df transparent; }
+}
+.scroll-slim::-webkit-scrollbar { width: 10px; height: 10px; }
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: #cdd7df; border-radius: 8px; border: 3px solid transparent;
+  background-clip: content-box;
+}
+.scroll-slim::-webkit-scrollbar-thumb:hover { background: #b3c0cb; background-clip: content-box; }
+.scroll-slim::-webkit-scrollbar-track { background: transparent; }
+
+@layer components {
+  .card { @apply bg-paper border border-paper-edge rounded-card; }
+
+  /* A card that is also a target. The whole surface lifts as one object rather than the
+     title changing colour on its own — a row that reacts in two places reads as two. */
+  .card-hover {
+    @apply transition-[transform,box-shadow,border-color] duration-200
+           hover:-translate-y-0.5 hover:shadow-lift hover:border-brand/25;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded
+           text-sm font-medium transition-[background-color,color,border-color,transform]
+           duration-150 active:translate-y-px
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0;
+  }
+  .btn-primary { @apply btn bg-brand text-white hover:bg-brand-deep; }
+  /* Navy text on gold, not white — the fill is light enough that white would fail contrast
+     on the one control the landing page most wants people to press. */
+  .btn-gold { @apply btn bg-gold-bright text-brand-ink font-semibold hover:bg-gold; }
+  .btn-ghost   { @apply btn border border-paper-edge bg-paper hover:bg-paper-soft; }
+  .btn-quiet   { @apply btn border border-transparent text-ink-soft hover:bg-paper-deep hover:text-ink; }
+  .btn-sm      { @apply px-2.5 py-1 text-[12px]; }
+
+  .field {
+    @apply w-full border border-paper-edge rounded px-3 py-2 text-sm
+           bg-paper placeholder:text-ink-faint transition-shadow
+           focus:outline-none focus:ring-2 focus:ring-brand/25 focus:border-brand;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px]
+           font-medium border;
+  }
+
+  /* A quiet capsule for standing labels — never for status, which uses .chip so that
+     severity and state keep one vocabulary. */
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-2xs
+           font-semibold uppercase tracking-wide;
+  }
+
+  /* The gold rule. Decoration, and the only horizontal gold band in the product, so it
+     reads as identity rather than as an alert nobody raised. */
+  .rule-gold { @apply h-[3px] bg-gold; }
+  /* Its short form, under a page title — a 64px stub that fades, not a full-width band. */
+  .rule-gold-stub {
+    @apply h-[3px] w-16 rounded-full;
+    background: linear-gradient(90deg, theme("colors.gold.DEFAULT"), theme("colors.gold.bright") 60%, transparent);
+  }
+
+  /* Headings only. Applied through a class so the serif/sans split is one decision. */
+  .display { @apply font-serif tracking-tight; }
+
+  /* Row that is safe to make clickable — the whole row is a target, not just the link. */
+  .row-link { @apply hover:bg-brand-soft/50 transition-colors cursor-pointer; }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-paper-edge/60 rounded;
+  }
+  /* A sweep rather than a pulse: a pulse says "busy", a sweep says "this shape is about to
+     be filled", which is the truer statement about a skeleton. */
+  .skeleton::after {
+    content: ""; @apply absolute inset-0 animate-shimmer;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / .55), transparent);
+  }
+
+  /* --- the signed-in chrome --------------------------------------------------------- */
+
+  .nav-item {
+    @apply relative flex items-center gap-3 rounded-rail px-3.5 py-2.5 text-sm
+           text-ink-soft transition-colors duration-150
+           hover:bg-brand-soft hover:text-brand;
+  }
+  .nav-item[aria-current="page"] {
+    @apply bg-brand-deep text-white font-medium shadow-card hover:bg-brand-deep hover:text-white;
+  }
+
+  /* The segmented control from the reference: one capsule holding two or three states, the
+     active one a filled pill that slides rather than blinking between positions. */
+  .segmented {
+    @apply relative inline-flex items-center gap-1 rounded-full border border-paper-edge
+           bg-paper p-1 shadow-card;
+  }
+  .segmented > button {
+    @apply relative z-10 rounded-full px-4 py-1.5 text-sm font-medium text-ink-soft
+           transition-colors duration-200 whitespace-nowrap;
+  }
+  .segmented > button[aria-selected="true"] { @apply text-white; }
+  .segmented-thumb {
+    @apply absolute z-0 rounded-full bg-brand-deep shadow-card;
+    transition: transform .32s cubic-bezier(.16,.84,.44,1), width .32s cubic-bezier(.16,.84,.44,1);
+  }
+}
+
+/* --- PDF highlight overlay ------------------------------------------------------------
+   multiply keeps the glyphs underneath readable, which matters when a reviewer is
+   checking a single digit. */
+.pramaan-highlight {
+  position: absolute;
+  mix-blend-mode: multiply;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+.pramaan-highlight--pulse { animation: pramaan-pulse 750ms cubic-bezier(.4,0,.2,1) 2; }
+
+@keyframes pramaan-pulse {
+  0%, 100% { opacity: .42; transform: scale(1); }
+  45%      { opacity: .95; transform: scale(1.012); }
+}
+
+/* The arrival marker: a single ring drawn around the highlight the moment the page settles,
+   so the eye is told WHERE on a dense page to look before it starts reading. One shot. */
+.pramaan-arrival {
+  position: absolute; pointer-events: none;
+  border: 2px solid theme("colors.brand.DEFAULT");
+  border-radius: 6px;
+}
+
+/* --- the evidence split ---------------------------------------------------------------
+   Two panes and a drag handle. Widths are a CSS variable so GSAP can drive the open, the
+   snap presets and the drag through one property, and so the closed state is the correct
+   layout with no JavaScript at all. */
+.split-grid {
+  display: grid;
+  grid-template-columns: var(--split-left) minmax(0, 1fr);
+}
+.split-handle {
+  @apply w-1.5 shrink-0 cursor-col-resize bg-paper-edge/60 transition-colors;
+}
+.split-handle:hover, .split-handle[data-dragging="true"] { @apply bg-brand/50; }
+.split-handle::after {
+  content: ""; position: absolute; inset-block: 0; left: -5px; right: -5px;  /* fat target */
+}
+
+/* Windows-style snap preview: the two zones flash once as the panes take their places, so
+   the gesture reads as "the window snapped" rather than "the layout jumped". */
+.snap-ghost {
+  @apply pointer-events-none absolute rounded-card border-2 border-brand/50 bg-brand/10;
+  animation: snap-ghost .42s cubic-bezier(.16,.84,.44,1) both;
+}
+@keyframes snap-ghost {
+  0%   { opacity: 0; transform: scale(.97); }
+  35%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pramaan-highlight--pulse { animation: none; opacity: .75; }
+  .snap-ghost { display: none; }
+  .skeleton::after { display: none; }
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { @apply bg-white; }
+  /* The app is a viewport-height column with an internally scrolling main region, which is
+     right on screen and wrong on paper — it would print one screenful and stop. On paper
+     the shell collapses to ordinary flowing document. */
+  html, body { height: auto !important; overflow: visible !important; }
+  .app-shell { display: block !important; height: auto !important; overflow: visible !important; }
+  .app-main  { display: block !important; height: auto !important; overflow: visible !important; }
+  .card { border-color: #b9c2ca; border-radius: 4px; }
+  /* Printed for the file: the sidebar, the rails and the split all collapse to one column
+     of findings, because that is the only part of this screen that belongs in a folder. */
+  .print-flat { display: block !important; width: 100% !important; }
+  .split-grid { display: block !important; }
+}
+
+/* ------------------------------------------------------------------ hero viewport fit --
+   The hero is the only section sized to the window rather than to its content. The three
+   figures and the trust strip are part of the first impression and were landing below the
+   fold on a laptop, so the panel is fitted into one viewport height minus the 78px sticky
+   header.
+
+   The rhythm is driven by `vh` inside clamp() rather than by fixed steps: as the window
+   gets shorter the gaps and the headline shrink together, so a short screen compresses the
+   panel instead of pushing the trust strip out of sight. The floors in each clamp are the
+   point below which the type stops being comfortable — past that the section is allowed to
+   grow again and scroll, which is why this is `min-height` and not `height`.
+
+   Confined to lg and up on purpose. Below that the layout is single-column over a dimmed
+   photo and the content genuinely cannot fit a phone viewport; forcing it there would clip
+   the call to action. */
+@media (min-width: 1024px) {
+  .hero-shell {
+    min-height: calc(100dvh - 78px);
+    display: flex;
+    align-items: center;
+  }
+  /* Scoped under `.hero-shell` for weight, not for reach: Tailwind's utilities are emitted
+     after this file, so a bare `.hero-container` rule loses the tie to `md:pt-16` /
+     `md:pb-28` and `md:p-12`. That is what used to leave ~112px of dead paper under the
+     trust strip — the inner rhythm below shrank to fit the viewport while the outer padding
+     stayed at its full-size value, so the panel overflowed the fold and still trailed a
+     gap. */
+  .hero-shell .hero-container {
+    padding-top: clamp(0.75rem, 2.6vh, 2.5rem);
+    padding-bottom: clamp(0.75rem, 2.6vh, 2.5rem);
+  }
+  .hero-shell .hero-panel { padding: clamp(1.5rem, 3.6vh, 3rem); }
+
+  .hero-panel .hero-title {
+    margin-top: clamp(0.9rem, 2.2vh, 1.75rem);
+    font-size: clamp(38px, 6.1vh, 62px);
+  }
+  .hero-panel .hero-rule    { margin-top: clamp(0.75rem, 1.9vh, 1.5rem); }
+  .hero-panel .hero-lede    { margin-top: clamp(0.85rem, 2.2vh, 1.75rem);
+                              font-size: clamp(15px, 1.95vh, 18px); }
+  .hero-panel .hero-actions { margin-top: clamp(1rem, 2.7vh, 2.25rem); }
+  .hero-panel .hero-stats   { margin-top: clamp(1.1rem, 3.1vh, 3rem); }
+  .hero-panel .hero-trust   { margin-top: clamp(0.9rem, 2.4vh, 2rem); }
+}
+
+/* At the default tracking the four trust claims do not fit the 2xl panel and "Audit-ready"
+   drops to a second row on its own, which reads as a mistake and, on a short laptop, was
+   also what pushed it past the fold. Tightening the strip just enough to keep it on one line
+   is cheaper than shrinking the headline further.
+
+   This was gated at `max-height: 820px` while the panel's own padding was still stuck at
+   `md:p-12` and the wrap only showed up on short screens; with the padding now following the
+   viewport the strip is the same width at every desktop height, so the fix is too. */
+@media (min-width: 1024px) {
+  .hero-panel .hero-trust {
+    column-gap: 0.6rem;
+    letter-spacing: 0.05em;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .hero-panel .hero-trust .trust-item { gap: 0.6rem; }
+}
