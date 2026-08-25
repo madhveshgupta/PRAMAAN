@@ -1,0 +1,1087 @@
+version: 2.0-sector-aware
+severity_weights:
+  critical: 3.0
+  high: 2.0
+  medium: 1.5
+  low: 1.0
+status_values:
+  pass: 1.0
+  partial: 0.5
+  insufficient_evidence: 0.0
+profiles:
+  horticulture_nhb:
+    label: NHB horticulture scheme DPR
+    provenance: National Horticulture Board model DPR template — sections 1-12 and 5.1-5.7. Derived from
+      the published template, not assumed.
+    cues:
+    - \bNHB\b
+    - national horticulture board
+    - \bhorticultur
+    - \borchard\b
+    - \bplanting material\b
+    - \bpack ?house\b
+    - \bpre.?cooling\b
+    - \bcrop husbandry\b
+    - \bagro.?climatic\b
+    - \bhectare\b.{0,40}\b(crop|plantation|orchard)\b
+    - \bdrip irrigation\b
+    - \bpost.?harvest\b
+    items:
+    - id: applicant_promoter
+      section: About the Applicant / Promoter
+      severity: high
+      detect:
+        headings:
+        - about the applicant
+        - promoter
+        - entrepreneurship
+        must_contain:
+        - applicant|promoter|proprietor|partnership|company
+        semantic: who the applicant is and their background
+    - id: benefits_availed
+      section: Benefits already availed by the Applicant
+      severity: medium
+      detect:
+        headings:
+        - benefits? availed
+        - subsid(y|ies) availed
+        - assistance availed
+        must_contain:
+        - availed|subsidy|assistance|earlier
+        semantic: government assistance the applicant has previously received
+      guidance: NHB requires disclosure of prior assistance to prevent double-funding.
+    - id: project_description
+      section: About the Project — name, rationale, description
+      severity: critical
+      detect:
+        headings:
+        - about (the )?project
+        - project (name|rationale|description)
+        must_contain:
+        - rationale|objective|propos
+        semantic: what the project is and why it is being proposed
+    - id: nhb_scheme
+      section: NHB scheme under which proposed
+      severity: high
+      detect:
+        headings:
+        - nhb scheme
+        - scheme under which
+        - scheme no
+        must_contain:
+        - nhb|scheme
+        semantic: which NHB scheme this application is made under
+    - id: agro_climatic
+      section: 5.1 Agro-climatic suitability
+      severity: critical
+      detect:
+        headings:
+        - agro.?climatic
+        - climatic suitability
+        - soil (type|health)
+        must_contain:
+        - soil|rainfall|temperature|climate
+        semantic: whether the site climate and soil suit the proposed crop
+      guidance: A horticulture project on unsuitable soil or climate fails regardless of its finances.
+    - id: market_viability
+      section: 5.2 Market viability
+      severity: critical
+      detect:
+        headings:
+        - market viability
+        - demand and supply
+        - target market
+        must_contain:
+        - demand|market|price|supply gap
+        semantic: demand, supply gap, target markets and price realisation
+    - id: project_cost
+      section: 5.3.2 Project Cost
+      severity: critical
+      detect:
+        headings:
+        - project cost
+        - cost of (the )?project
+        - capital cost
+        must_contain:
+        - total|cost
+        semantic: the itemised capital cost of the project
+    - id: means_of_finance
+      section: 5.3.3 Means of Finance
+      severity: critical
+      detect:
+        headings:
+        - means of finance
+        - financing pattern
+        - sources of fund
+        must_contain:
+        - term loan|promoter|margin|subsidy|equity
+        semantic: how the project is funded — promoter contribution, term loan, subsidy
+    - id: financial_indicators
+      section: 5.3.5 Key financial indicators (IRR, NPV, BEP)
+      severity: critical
+      detect:
+        headings:
+        - key financial indicator
+        - financial indicator
+        - internal rate of return
+        - \bIRR\b
+        - break.?even
+        must_contain:
+        - irr|internal rate of return|npv|net present value|break.?even
+        semantic: IRR, NPV, break-even and economic rate of return with assumptions
+    - id: project_financing_terms
+      section: 5.3.6 Project financing — interest, loan share
+      severity: high
+      detect:
+        headings:
+        - project financing
+        - rate of interest
+        - term loan
+        must_contain:
+        - interest|term loan|repayment
+        semantic: rate of interest and the term loan share of project cost
+    - id: cashflow_statement
+      section: 5.3.6(7) Cash flow statement for repayment period
+      severity: critical
+      detect:
+        headings:
+        - cash.?flow
+        - projected cash
+        - fund flow
+        must_contain:
+        - cash flow|inflow|outflow|year
+        semantic: year-wise projected cash flow across the repayment period
+    - id: profitability
+      section: 5.3.6(4,8) Cost of production, P&L, profitability
+      severity: high
+      detect:
+        headings:
+        - profit.{0,3}(and|&).{0,3}loss
+        - profitability
+        - cost of production
+        must_contain:
+        - profit|revenue|income|expenditure
+        semantic: cost of production and projected profitability
+    - id: repayment_schedule
+      section: 5.3.6(9) Term loan repayment schedule
+      severity: high
+      detect:
+        headings:
+        - repayment
+        - loan schedule
+        - \bDSCR\b
+        must_contain:
+        - repayment|instal|dscr|moratorium
+        semantic: how and when the term loan is repaid
+    - id: crop_husbandry
+      section: 5.4 Land development and crop husbandry
+      severity: critical
+      detect:
+        headings:
+        - crop husbandry
+        - land development
+        - planting material
+        - planting season
+        must_contain:
+        - planting|spacing|nursery|irrigation|nutrient
+        semantic: layout, planting material, spacing, water and nutrient management
+    - id: post_harvest
+      section: 5.5 Post-harvest management
+      severity: high
+      detect:
+        headings:
+        - post.?harvest
+        - pack ?house
+        - pre.?cooling
+        - cold (room|storage)
+        must_contain:
+        - grading|sorting|packing|storage|cooling
+        semantic: pack house, pre-cooling, grading, packing and storage
+    - id: marketing
+      section: 5.6 Marketing
+      severity: high
+      detect:
+        headings:
+        - \bmarketing\b
+        - value chain
+        - aggregation
+        - market institutions
+        must_contain:
+        - market|buyer|channel|traceab
+        semantic: how the produce reaches buyers and through what channel
+    - id: value_addition
+      section: 5.7 Value addition / processing
+      severity: medium
+      detect:
+        headings:
+        - value addition
+        - processing
+        must_contain:
+        - process|value addition|grading
+        semantic: processing or value addition proposed
+    - id: technology_experts
+      section: 6 Technology providers / expert support
+      severity: medium
+      detect:
+        headings:
+        - technology provider
+        - icar|sau\b|krishi vigyan
+        - expert
+        must_contain:
+        - icar|university|expert|technical support|kvk
+        semantic: technical institutions or experts supporting the project
+    - id: food_safety
+      section: 7 Food safety / GAP certification
+      severity: medium
+      detect:
+        headings:
+        - food safety
+        - \bGAP\b
+        - certification
+        must_contain:
+        - food safety|gap|residue|certif
+        semantic: food safety measures and any GAP certification
+    - id: land_title
+      section: Land — area, survey number and title
+      severity: critical
+      detect:
+        headings:
+        - land
+        - khasra|survey no|gat no|dag no
+        must_contain:
+        - acre|hectare|khasra|survey|lease|owned
+        semantic: the land the project sits on and the applicant title to it
+    - id: declarations
+      section: 11-12 Expert declaration and self-declaration
+      severity: high
+      detect:
+        headings:
+        - declaration
+        - self.?declaration
+        - certified that
+        must_contain:
+        - declar|certify|undertake
+        semantic: signed declarations by the crop expert, finance expert and applicant
+      guidance: NHB requires the DPR to be certified by a crop expert and a project finance expert.
+  infrastructure:
+    label: Infrastructure DPR (bridges, roads, civil works)
+    provenance: KIIFB "Template for Preparation of Detailed Project Report (DPR) in r/o Bridges", chapters
+      1-3.17 and Annexures I-VII. A published government template, not an assumed structure. Aligns with
+      IRC:SP:19 for surveys.
+    cues:
+    - \bbridge\b
+    - \bhighway\b
+    - \bcarriageway\b
+    - \bIRC\b
+    - \bcross drainage\b
+    - \bapproach road\b
+    - \bcarriage way\b
+    - \bchainage\b
+    - \bsuperstructure\b
+    - \bsubstructure\b
+    - \bpavement\b
+    - \bculvert\b
+    - \bright of way\b
+    - \bMoRTH\b
+    items:
+    - id: salient_features
+      section: 1. Salient Features
+      severity: high
+      detect:
+        headings:
+        - salient features?
+        - project at a glance
+        must_contain:
+        - implementing agency|project outlay|administrative sanction
+        semantic: the one-page summary of title, agency, outlay and sanction status
+      guidance: The template requires 27 specific entries here, including budget provision, administrative
+        sanction and the O&M arrangement.
+    - id: executive_summary
+      section: 2. Executive Summary
+      severity: high
+      detect:
+        headings:
+        - executive summary
+        must_contain:
+        - project|cost|summary
+        semantic: a brief of every chapter that follows
+    - id: introduction
+      section: 3.1 Introduction
+      severity: medium
+      detect:
+        headings:
+        - 3\.1\s+INTRODUCTION
+        - ^\s*introduction\s*$
+        - project definition
+        - project background
+        must_contain:
+        - topography|location|background|need for the project
+        semantic: type of project, location, topography, geology and historical background
+    - id: project_scope
+      section: 3.1.1 Project Definition, Concept and Scope
+      severity: critical
+      detect:
+        headings:
+        - project definition
+        - concept and scope
+        - scope of (the )?work
+        must_contain:
+        - scope|sub.?component|land required
+        semantic: the sub-components, land required and whether acquisition is needed
+    - id: feasibility_status
+      section: 3.2 Status of Feasibility Studies
+      severity: medium
+      detect:
+        headings:
+        - feasibility stud
+        must_contain:
+        - feasibility|earlier study|outcome
+        semantic: any earlier feasibility study and its outcome
+    - id: demand_analysis
+      section: 3.3 Requirement / Demand Analysis
+      severity: critical
+      detect:
+        headings:
+        - demand analysis
+        - requirement analysis
+        - need for the project
+        must_contain:
+        - demand|traffic|stakeholder|rationale|benefit
+        semantic: the problem faced by stakeholders and the objective research justifying it
+      guidance: The template is explicit that this must rest on objective research, not subjective impressions.
+    - id: surveys_investigations
+      section: 3.4 Engineering Surveys and Investigations
+      severity: critical
+      detect:
+        headings:
+        - 3\.4\s+ENGINEERING SURVEYS
+        - engineering surveys?\s+and\s+investigations?
+        - topographic survey
+        - soil and materials survey
+        - levelling survey
+        must_contain:
+        - survey|borehole|bore log|CBR|GPS|benchmark|quarry|borrow area
+        semantic: topographic and levelling survey, soil and materials investigation with CBR, borrow
+          and quarry details, and traffic survey
+    - id: functional_design
+      section: 3.5 Functional Design
+      severity: high
+      detect:
+        headings:
+        - functional design
+        - alignment
+        - span arrangement
+        must_contain:
+        - alignment|span|option|alternative
+        semantic: the options considered and why the proposed one was selected
+    - id: engineering_design
+      section: 3.6 Engineering Design
+      severity: critical
+      detect:
+        headings:
+        - 3\.6\s+ENGINEERING DESIGN
+        - engineering design\b
+        - structural design
+        - design of (super|sub)structure
+        must_contain:
+        - design|IRC|IS\s?\d|load|foundation
+        semantic: the structural design and the codes it conforms to
+    - id: financial_estimates
+      section: 3.7 Financial Estimates and Cost Projections
+      severity: critical
+      detect:
+        headings:
+        - financial estimate
+        - cost projection
+        - abstract of cost
+        - cost estimate
+        must_contain:
+        - estimate|schedule of rates|SOR|abstract|total
+        semantic: the cost estimate with its rate basis and the detailed estimate attached
+    - id: revenue_streams
+      section: 3.8 Revenue Streams
+      severity: medium
+      detect:
+        headings:
+        - revenue stream
+        - revenue model
+        - toll
+        must_contain:
+        - revenue|toll|user charge|income
+        semantic: what revenue, if any, the asset will generate
+    - id: cost_benefit
+      section: 3.9 Cost Benefit Analysis and Investment Criteria
+      severity: critical
+      detect:
+        headings:
+        - cost benefit
+        - benefit cost
+        - \bBCR\b
+        - investment criteria
+        - internal rate of return
+        - \bIRR\b
+        - \bNPV\b
+        must_contain:
+        - BCR|benefit cost|IRR|NPV|discount
+        semantic: BCR, IRR, NPV and the investment criteria applied
+    - id: environment
+      section: 3.10 Environmental and Sustainability Aspects
+      severity: critical
+      detect:
+        headings:
+        - environment(al)? (and|&) sustainab
+        - environmental aspect
+        - environmental clearance
+        must_contain:
+        - environment|clearance|mitigation|tree|pollution
+        semantic: environmental impact, clearances and sustainability measures
+    - id: risk_assessment
+      section: 3.11 Risk Assessment and Mitigation Measures
+      severity: high
+      detect:
+        headings:
+        - risk assessment
+        - risk (and|&) mitigation
+        - risk register
+        must_contain:
+        - risk|mitigation|avoidance|transfer
+        semantic: identified risks and the mitigation plan for each
+    - id: project_management
+      section: 3.12 Project Management Organisation
+      severity: medium
+      detect:
+        headings:
+        - project management organisation
+        - management arrangement
+        - organisation structure
+        must_contain:
+        - organisation|responsib|monitoring|human resource
+        semantic: who manages the project and how it is monitored
+    - id: contract_strategy
+      section: 3.13 Contract Management Strategy
+      severity: medium
+      detect:
+        headings:
+        - contract management
+        - contracting methodology
+        - mode of execution
+        must_contain:
+        - contract|EPC|item rate|lump\s?sum|bidding
+        semantic: the contracting methodology and the bidding system followed
+    - id: implementation_schedule
+      section: 3.14 Implementation Schedule and WBS
+      severity: high
+      detect:
+        headings:
+        - implementation schedule
+        - work breakdown
+        - \bWBS\b
+        - bar chart
+        - milestone
+        must_contain:
+        - schedule|milestone|month|zero date|bar chart
+        semantic: the zero date, bar chart, phasing and critical dependencies
+    - id: statutory_clearances
+      section: 3.15 Statutory Clearances
+      severity: critical
+      detect:
+        headings:
+        - statutory clearance
+        - statutory approval
+        - clearances required
+        must_contain:
+        - clearance|approval|NOC|sanction|permission
+        semantic: every statutory clearance required and its status
+    - id: quality_plan
+      section: 3.16 Quality Management Plan
+      severity: high
+      detect:
+        headings:
+        - quality management
+        - quality assurance
+        - quality control
+        must_contain:
+        - quality|inspection|testing|third party
+        semantic: the QA/QC institution, testing procedure and third-party mechanism
+    - id: om_plan
+      section: 3.17 Operations and Maintenance Plan
+      severity: critical
+      detect:
+        headings:
+        - operations? (and|&) maintenance
+        - \bO&M\b
+        - maintenance plan
+        must_contain:
+        - maintenance|O&M|recurring|fund
+        semantic: who operates and maintains the asset, and the funds required to do so
+      guidance: The template asks specifically for the REQUIREMENT OF FUNDS for O&M. An asset with no
+        identified recurring source has a shorter life than its design life.
+    - id: annexures
+      section: Annexures I-VII
+      severity: high
+      detect:
+        headings:
+        - ANNEXURE\s+[IVX]+
+        - key map of the project
+        - general arrangement drawing
+        - geo.?technical investigation report
+        - hydraulic investigation report
+        must_contain:
+        - annexure|drawing|key map|general arrangement|investigation report
+        semantic: key map, alignment and GA drawings, detailed estimate, geotechnical and hydraulic investigation
+          reports, and copies of statutory approvals
+  building_kiifb:
+    label: Building / social infrastructure DPR (hospital, school, office block)
+    provenance: KIIFB "Template for Preparation of Detailed Project Report (DPR)" for Buildings — Table
+      of Contents chapters 1-18, transcribed from the published template in docs/reference/. Chapter
+      titles and numbering are the template's own, not assumed.
+    cues:
+    - \bhospital\b
+    - \b\d{2,4}[\s-]?bedded?\b
+    - \bOPD\b
+    - \boutpatient\b
+    - \bward block\b
+    - \bbuilt.?up area\b
+    - \bplinth area\b
+    - \bfloor area ratio\b
+    - \bstore?y(s|ed)?\b
+    - \bNational Building Code\b
+    - \bNBC\s?20\d\d\b
+    - \bHVAC\b
+    - \bschool building\b
+    - \bhostel block\b
+    - \bfire safety\b
+    items:
+    - id: salient_features
+      section: 1. Salient Features
+      severity: high
+      detect:
+        headings:
+        - salient features?
+        - project at a glance
+        must_contain:
+        - implementing agency|project outlay|administrative sanction
+        semantic: the one-page summary of title, agency, outlay and sanction status
+      guidance: The Buildings template asks for 27 salient entries, including budget provision, nature
+        of the project and the O&M arrangement.
+    - id: executive_summary
+      section: 2. Executive Summary
+      severity: high
+      detect:
+        headings:
+        - executive summary
+        - summary of the project
+        must_contain:
+        - project|cost|propos
+        semantic: the standalone summary an appraiser reads first
+    - id: project_background
+      section: 3. Project Background
+      severity: medium
+      detect:
+        headings:
+        - project background
+        - background\b
+        - introduction
+        must_contain:
+        - background|existing|present status|need for
+        semantic: the present position and why the project is needed
+    - id: feasibility_studies
+      section: 4. Project Feasibility Studies
+      severity: critical
+      detect:
+        headings:
+        - project feasibility stud
+        - feasibility stud
+        - feasibility report
+        must_contain:
+        - feasibility|viable|pre.?feasibility|study
+        semantic: the feasibility studies carried out and their conclusions
+    - id: surveys_investigations
+      section: 5. Site Surveys and Investigations
+      severity: critical
+      detect:
+        headings:
+        - site surveys? and investigations?
+        - surveys? and investigations?
+        - geo.?technical investigation
+        - soil investigation
+        must_contain:
+        - survey|investigation|borehole|bearing capacity|topograph|soil
+        semantic: topographic survey, soil and geotechnical investigation of the site
+      guidance: A building estimate written before the soil is tested is a foundation cost waiting to
+        be revised.
+    - id: functional_design
+      section: 6. Functional Design
+      severity: critical
+      detect:
+        headings:
+        - functional design
+        - space (programme|program|requirement)
+        - functional requirement
+        must_contain:
+        - functional|space|area|layout|department|circulation
+        semantic: the space programme — what each area is for and how the building is used
+    - id: engineering_design
+      section: 7. Engineering Design
+      severity: critical
+      detect:
+        headings:
+        - engineering design
+        - structural design
+        - services design
+        must_contain:
+        - design|IS\s?\d|load|foundation|structural|reinforce
+        semantic: the structural and services design and the codes it conforms to
+    - id: financial_estimates
+      section: 8. Financial Estimates and Cost Projections
+      severity: critical
+      detect:
+        headings:
+        - financial estimate
+        - cost projection
+        - abstract of cost
+        - cost estimate
+        must_contain:
+        - estimate|schedule of rates|SOR|abstract|total
+        semantic: the cost estimate, its rate basis, and the item-wise break-up
+    - id: revenue_streams
+      section: 9. Revenue Streams
+      severity: medium
+      detect:
+        headings:
+        - revenue stream
+        - revenue model
+        - user charge
+        must_contain:
+        - revenue|user charge|fee|income|tariff
+        semantic: what revenue, if any, the facility will generate
+    - id: cost_benefit
+      section: 10. Cost Benefit Analysis and Investment Criteria
+      severity: critical
+      detect:
+        headings:
+        - cost benefit
+        - benefit cost
+        - \bBCR\b
+        - investment criteria
+        - internal rate of return
+        - \bIRR\b
+        - \bNPV\b
+        must_contain:
+        - BCR|benefit cost|IRR|NPV|discount
+        semantic: BCR, IRR, NPV and the investment criteria applied
+    - id: risk_assessment
+      section: 11. Risk Assessment and Mitigation Measures
+      severity: high
+      detect:
+        headings:
+        - risk assessment
+        - risk (and|&) mitigation
+        - risk register
+        must_contain:
+        - risk|mitigation|avoidance|transfer
+        semantic: identified risks and the mitigation plan for each
+    - id: project_management
+      section: 12. Project Management Organisation
+      severity: medium
+      detect:
+        headings:
+        - project management organisation
+        - management arrangement
+        - organisation structure
+        must_contain:
+        - organisation|responsib|monitoring|human resource
+        semantic: who manages the project and how it is monitored
+    - id: contract_strategy
+      section: 13. Contract Management Strategy
+      severity: medium
+      detect:
+        headings:
+        - contract management
+        - contracting methodology
+        - mode of execution
+        must_contain:
+        - contract|EPC|item rate|lump\s?sum|bidding
+        semantic: the contracting methodology and the bidding system followed
+    - id: implementation_schedule
+      section: 14. Implementation Schedule and WBS
+      severity: high
+      detect:
+        headings:
+        - implementation schedule
+        - work breakdown
+        - \bWBS\b
+        - bar chart
+        - milestone
+        must_contain:
+        - schedule|milestone|month|zero date|bar chart
+        semantic: the zero date, bar chart, phasing and critical dependencies
+    - id: statutory_clearances
+      section: 15. Statutory Clearances
+      severity: critical
+      detect:
+        headings:
+        - statutory clearance
+        - statutory approval
+        - clearances required
+        must_contain:
+        - clearance|approval|NOC|sanction|permission
+        semantic: every statutory clearance required and its status
+      guidance: For buildings this includes the local body building permit, fire NOC and, where
+        applicable, pollution control and environmental consent.
+    - id: quality_plan
+      section: 16. Quality Management Plan
+      severity: high
+      detect:
+        headings:
+        - quality management
+        - quality assurance
+        - quality control
+        must_contain:
+        - quality|inspection|testing|third party
+        semantic: the QA/QC institution, testing procedure and third-party mechanism
+    - id: om_plan
+      section: 17. Operations and Maintenance Plan
+      severity: critical
+      detect:
+        headings:
+        - operations? (and|&) maintenance
+        - \bO&M\b
+        - maintenance plan
+        must_contain:
+        - maintenance|O&M|recurring|fund
+        semantic: who operates and maintains the building, and the funds required to do so
+      guidance: The template asks specifically for the REQUIREMENT OF FUNDS for O&M and the source
+        those funds come from. A named source is the point of the chapter.
+    - id: annexures
+      section: 18. Annexures
+      severity: high
+      detect:
+        headings:
+        - ANNEXURE\s+[IVX0-9]+
+        - key plan
+        - architectural drawing
+        - detailed estimate
+        must_contain:
+        - annexure|drawing|key plan|detailed estimate|approval
+        semantic: site plan, architectural and structural drawings, the detailed estimate, and copies
+          of statutory approvals
+  general_kiifb:
+    label: Public works DPR — water supply, sewerage and other services (KIIFB general template)
+    provenance: KIIFB "Guidelines for preparing Detailed Project Report" general template — Table of
+      Contents chapters 1-18, transcribed from the published template in docs/reference/. This is the
+      template KIIFB directs projects to when no sector-specific template applies; chapter 11
+      (Environmental and Sustainability Aspects) is present here and absent from the Buildings
+      template, and the rubric reproduces that difference rather than flattening it.
+    cues:
+    - \bwater supply\b
+    - \bMLD\b
+    - \bwater treatment plant\b
+    - \bWTP\b
+    - \bsewerage\b
+    - \bdistribution network\b
+    - \boverhead tank\b
+    - \bpumping (station|main)\b
+    - \braw water\b
+    - \bhouse service connection\b
+    - \blpcd\b
+    - \bJal Jeevan\b
+    - \bintake well\b
+    - \bclear water\b
+    items:
+    - id: salient_features
+      section: 1. Salient Features
+      severity: high
+      detect:
+        headings:
+        - salient features?
+        - project at a glance
+        must_contain:
+        - implementing agency|project outlay|administrative sanction
+        semantic: the one-page summary of title, agency, outlay and sanction status
+      guidance: The general template asks for 21 salient entries, ending with the O&M arrangement.
+    - id: executive_summary
+      section: 2. Executive Summary
+      severity: high
+      detect:
+        headings:
+        - executive summary
+        - summary of the project
+        must_contain:
+        - project|cost|propos
+        semantic: the standalone summary an appraiser reads first
+    - id: introduction
+      section: 3. Introduction
+      severity: medium
+      detect:
+        headings:
+        - introduction
+        - project background
+        - background\b
+        must_contain:
+        - introduc|background|existing|present status|need for
+        semantic: the present position and why the project is needed
+    - id: feasibility_status
+      section: 4. Status of Feasibility Studies
+      severity: medium
+      detect:
+        headings:
+        - status (of )?feasibility stud
+        - feasibility stud
+        - feasibility report
+        must_contain:
+        - feasibility|viable|pre.?feasibility|study
+        semantic: which feasibility studies were done and what they concluded
+    - id: demand_analysis
+      section: 5. Requirement / Demand Analysis
+      severity: critical
+      detect:
+        headings:
+        - requirement\s*/?\s*demand analysis
+        - demand analysis
+        - demand (projection|forecast|assessment)
+        - population projection
+        must_contain:
+        - demand|projection|population|design period|forecast|requirement
+        semantic: the demand the scheme is sized for, and the horizon it is projected over
+      guidance: For a water scheme this is the population projection and per-capita demand that fix
+        every downstream quantity. Without it the capacity has no stated basis.
+    - id: functional_design
+      section: 6. Functional Design
+      severity: critical
+      detect:
+        headings:
+        - functional design
+        - scheme (component|configuration)
+        - process design
+        must_contain:
+        - functional|component|scheme|layout|capacity|process
+        semantic: the components of the scheme and how they work together
+    - id: engineering_design
+      section: 7. Engineering Design
+      severity: critical
+      detect:
+        headings:
+        - engineering design
+        - hydraulic design
+        - structural design
+        must_contain:
+        - design|IS\s?\d|CPHEEO|hydraulic|head loss|structural
+        semantic: the hydraulic and structural design and the codes it conforms to
+    - id: financial_estimates
+      section: 8. Financial Estimates and Cost Projections
+      severity: critical
+      detect:
+        headings:
+        - financial estimate
+        - cost projection
+        - abstract of cost
+        - cost estimate
+        must_contain:
+        - estimate|schedule of rates|SOR|abstract|total
+        semantic: the cost estimate, its rate basis, and the item-wise break-up
+    - id: revenue_streams
+      section: 9. Revenue Streams
+      severity: medium
+      detect:
+        headings:
+        - revenue stream
+        - revenue model
+        - tariff
+        - user charge
+        must_contain:
+        - revenue|tariff|user charge|water charge|income
+        semantic: what revenue, if any, the scheme will generate
+    - id: cost_benefit
+      section: 10. Cost Benefit Analysis and Investment Criteria
+      severity: critical
+      detect:
+        headings:
+        - cost benefit
+        - benefit cost
+        - \bBCR\b
+        - investment criteria
+        - internal rate of return
+        - \bIRR\b
+        - \bNPV\b
+        must_contain:
+        - BCR|benefit cost|IRR|NPV|discount
+        semantic: BCR, IRR, NPV and the investment criteria applied
+    - id: environment
+      section: 11. Environmental and Sustainability Aspects
+      severity: critical
+      detect:
+        headings:
+        - environment(al)? (and|&) sustainab
+        - environmental aspect
+        - environmental clearance
+        - sustainability
+        must_contain:
+        - environment|clearance|mitigation|sustainab|pollution|effluent
+        semantic: environmental impact, clearances and sustainability measures
+      guidance: Present in the general template and absent from the Buildings one. A water or
+        sewerage scheme abstracts or discharges, so this chapter is not optional for it.
+    - id: risk_assessment
+      section: 12. Risk Assessment and Mitigation Measures
+      severity: high
+      detect:
+        headings:
+        - risk assessment
+        - risk (and|&) mitigation
+        - risk register
+        must_contain:
+        - risk|mitigation|avoidance|transfer
+        semantic: identified risks and the mitigation plan for each
+    - id: project_management
+      section: 13. Project Management Organisation
+      severity: medium
+      detect:
+        headings:
+        - project management organisation
+        - management arrangement
+        - organisation structure
+        must_contain:
+        - organisation|responsib|monitoring|human resource
+        semantic: who manages the project and how it is monitored
+    - id: contract_strategy
+      section: 14. Contract Management Strategy
+      severity: medium
+      detect:
+        headings:
+        - contract management
+        - contracting methodology
+        - mode of execution
+        must_contain:
+        - contract|EPC|item rate|lump\s?sum|bidding
+        semantic: the contracting methodology and the bidding system followed
+    - id: implementation_schedule
+      section: 15. Implementation Schedule and WBS
+      severity: high
+      detect:
+        headings:
+        - implementation schedule
+        - work breakdown
+        - \bWBS\b
+        - bar chart
+        - milestone
+        must_contain:
+        - schedule|milestone|month|zero date|bar chart
+        semantic: the zero date, bar chart, phasing and critical dependencies
+    - id: statutory_clearances
+      section: 16. Statutory Clearances
+      severity: critical
+      detect:
+        headings:
+        - statutory clearance
+        - statutory approval
+        - clearances required
+        must_contain:
+        - clearance|approval|NOC|sanction|permission
+        semantic: every statutory clearance required and its status
+    - id: quality_plan
+      section: 17. Quality Management Plan
+      severity: high
+      detect:
+        headings:
+        - quality management
+        - quality assurance
+        - quality control
+        must_contain:
+        - quality|inspection|testing|third party
+        semantic: the QA/QC institution, testing procedure and third-party mechanism
+    - id: om_plan
+      section: 18. Operations and Maintenance Plan
+      severity: critical
+      detect:
+        headings:
+        - operations? (and|&) maintenance
+        - \bO&M\b
+        - maintenance plan
+        must_contain:
+        - maintenance|O&M|recurring|fund
+        semantic: who operates and maintains the scheme, and the funds required to do so
+      guidance: A water scheme's recurring energy and chemical cost is the largest single reason
+        schemes stop running. The template asks for the requirement of funds and its source.
+    - id: annexures
+      section: Annexures
+      severity: high
+      detect:
+        headings:
+        - ANNEXURE\s+[IVX0-9]+
+        - key plan
+        - detailed estimate
+        - design calculation
+        must_contain:
+        - annexure|drawing|key plan|detailed estimate|approval
+        semantic: scheme drawings, design calculations, the detailed estimate, and copies of
+          statutory approvals
+  generic:
+    label: Generic fallback
+    provenance: Minimal common core, used when no profile matches. The reviewer is told.
+    cues: []
+    items:
+    - id: objectives
+      section: Objectives and Expected Outcomes
+      severity: high
+      detect:
+        headings:
+        - objective
+        - executive summary
+        - introduction
+        must_contain:
+        - objective|purpose|outcome
+        semantic: what the project is for
+    - id: project_cost
+      section: Project Cost
+      severity: critical
+      detect:
+        headings:
+        - project cost
+        - cost estimate
+        - abstract of cost
+        must_contain:
+        - cost
+        - total|lakh|crore
+        semantic: what the project costs
+    - id: means_of_finance
+      section: Means of Finance
+      severity: critical
+      detect:
+        headings:
+        - means of finance
+        - financing
+        - funding
+        must_contain:
+        - fund|finance|loan|grant|share
+        semantic: how it is paid for
+    - id: implementation_schedule
+      section: Implementation Schedule
+      severity: high
+      detect:
+        headings:
+        - implementation schedule
+        - time schedule
+        - milestone
+        must_contain:
+        - month|schedule|milestone
+        semantic: the delivery timeline
+    - id: risk
+      section: Risk Analysis
+      severity: high
+      detect:
+        headings:
+        - risk
+        must_contain:
+        - risk|mitigat
+        semantic: project risks
+    - id: maintenance
+      section: Operation and Maintenance
+      severity: critical
+      detect:
+        headings:
+        - operation.*maintenance
+        - \bO&M\b
+        - maintenance
+        must_contain:
+        - maintenance|recurring|upkeep
+        semantic: who maintains the asset and how that is funded
