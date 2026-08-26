@@ -1,0 +1,30 @@
+# Every configurable threshold in PRAMAAN. Seeded into the `settings` table.
+# Nothing here may be hardcoded in application code — Ministry edits these without a deploy.
+
+fuzzy_threshold_prose:
+  value: 90
+  description: "rapidfuzz partial_ratio floor for locating a PROSE span. Numbers never use this."
+numeric_match_mode:
+  value: strict
+  description: "Numeric/date/currency matching. 'strict' = exact after canonicalisation. Fuzzy-matching a number is unsafe: 412.50 and 4l2.5O score highly and differ."
+evidence_strong_threshold:
+  value: 0.75
+  description: "Compliance evidence score at or above which an item is PASS; below is PARTIAL."
+contradiction_tolerance_pct:
+  value: 0.5
+  description: "Relative divergence (%) within a numeric cluster before F4 emits a contradiction. Keeps rounding quiet."
+duplicate_similarity_threshold:
+  value: 0.85
+  description: "Cosine similarity above which F10 flags a possible duplicate project."
+price_deviation_bands:
+  value: {info: 10, warning: 30}
+  description: "Percent deviation from benchmark rate mapping to severity. F5 is BLOCKED pending real SoR data."
+irr_tolerance_pp:
+  value: 1.0
+  description: "Percentage points between claimed and recomputed IRR before F6 flags."
+low_confidence_threshold:
+  value: 0.75
+  description: "Extraction confidence below which a field is marked needs_human_verification."
+component_weights:
+  value: {completeness: 0.25, consistency: 0.25, cost_realism: 0.25, financial: 0.25}
+  description: "Overall quality score weighting. Even split is a placeholder — M3 and M4 to agree."
