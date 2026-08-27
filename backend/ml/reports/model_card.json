@@ -1,0 +1,201 @@
+{
+  "refused_for_leakage": [],
+  "trained_on": "MoSPI PAIMANA Flash Report, June 2026",
+  "records_parsed": 1604,
+  "records_used": 1604,
+  "split": "out-of-time by project approval year",
+  "excluded_features": [
+    "expenditure_cr",
+    "physical_progress_pct",
+    "approval_year"
+  ],
+  "excluded_because": "outcome-adjacent \u2014 unavailable for an unstarted project, which is exactly what a DPR describes",
+  "known_limitations": [
+    "Single monthly report, so the out-of-time split uses approval year rather than report month. A multi-month panel would be stronger.",
+    "cost_revised_cr is right-censored: an ongoing project can overrun further, so cost overrun is a floor, not a final figure.",
+    "76% of projects show zero recorded cost overrun, so the cost target is heavily zero-inflated and schedule delay carries more signal.",
+    "MoSPI records project attributes, not DPR text. Risk is predicted from project structure and sponsor track record, never from prose quality."
+  ],
+  "results": [
+    {
+      "target": "cost overrun > 5%",
+      "train_n": 1291,
+      "test_n": 313,
+      "split_on": "approval_year <= 2023 trains, later tests",
+      "model": {
+        "n": 313,
+        "positive_rate": 0.0192,
+        "accuracy": 0.6422,
+        "precision": 0.0431,
+        "recall": 0.8333,
+        "f1": 0.082,
+        "brier": 0.0908,
+        "auc": 0.807,
+        "decision_threshold": 0.2479,
+        "threshold_note": "Reported at the training base rate, not 0.5. With a low base rate a 0.5 cutoff yields no positive predictions even for a well-ranked model."
+      },
+      "baseline_majority": {
+        "n": 313,
+        "positive_rate": 0.0192,
+        "accuracy": 0.9808,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "brier": 0.0711,
+        "auc": 0.5
+      },
+      "baseline_sector_rate": {
+        "n": 313,
+        "positive_rate": 0.0192,
+        "accuracy": 0.9808,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "brier": 0.0594,
+        "auc": 0.6916
+      },
+      "beats_baselines": [
+        "sector-rate baseline (AUC)"
+      ],
+      "leak_warning": null,
+      "ranks_better_than_base_rate": true,
+      "calibration_beats_base_rate": false,
+      "verdict": "marginal",
+      "top_features": [
+        [
+          "log_cost",
+          2149
+        ],
+        [
+          "planned_duration_months",
+          1624
+        ],
+        [
+          "state_hist_overrun",
+          562
+        ],
+        [
+          "agency_hist_overrun",
+          489
+        ],
+        [
+          "state",
+          399
+        ],
+        [
+          "sector_hist_overrun",
+          191
+        ],
+        [
+          "ministry",
+          87
+        ],
+        [
+          "sector",
+          81
+        ]
+      ],
+      "features": [
+        "sector",
+        "ministry",
+        "state",
+        "log_cost",
+        "planned_duration_months",
+        "is_mega",
+        "agency_hist_overrun",
+        "sector_hist_overrun",
+        "state_hist_overrun"
+      ]
+    },
+    {
+      "target": "schedule delay",
+      "train_n": 1291,
+      "test_n": 313,
+      "split_on": "approval_year <= 2023 trains, later tests",
+      "model": {
+        "n": 313,
+        "positive_rate": 0.2396,
+        "accuracy": 0.4984,
+        "precision": 0.299,
+        "recall": 0.8133,
+        "f1": 0.4373,
+        "brier": 0.4517,
+        "auc": 0.616,
+        "decision_threshold": 0.7219,
+        "threshold_note": "Reported at the training base rate, not 0.5. With a low base rate a 0.5 cutoff yields no positive predictions even for a well-ranked model."
+      },
+      "baseline_majority": {
+        "n": 313,
+        "positive_rate": 0.2396,
+        "accuracy": 0.2396,
+        "precision": 0.2396,
+        "recall": 1.0,
+        "f1": 0.3866,
+        "brier": 0.4148,
+        "auc": 0.5
+      },
+      "baseline_sector_rate": {
+        "n": 313,
+        "positive_rate": 0.2396,
+        "accuracy": 0.3099,
+        "precision": 0.2191,
+        "recall": 0.7333,
+        "f1": 0.3374,
+        "brier": 0.4237,
+        "auc": 0.5052
+      },
+      "beats_baselines": [
+        "sector-rate baseline (AUC)"
+      ],
+      "leak_warning": null,
+      "ranks_better_than_base_rate": true,
+      "calibration_beats_base_rate": false,
+      "verdict": "marginal",
+      "top_features": [
+        [
+          "log_cost",
+          2060
+        ],
+        [
+          "planned_duration_months",
+          1677
+        ],
+        [
+          "agency_hist_overrun",
+          664
+        ],
+        [
+          "state_hist_overrun",
+          428
+        ],
+        [
+          "state",
+          378
+        ],
+        [
+          "sector_hist_overrun",
+          286
+        ],
+        [
+          "ministry",
+          71
+        ],
+        [
+          "sector",
+          28
+        ]
+      ],
+      "features": [
+        "sector",
+        "ministry",
+        "state",
+        "log_cost",
+        "planned_duration_months",
+        "is_mega",
+        "agency_hist_overrun",
+        "sector_hist_overrun",
+        "state_hist_overrun"
+      ]
+    }
+  ]
+}
