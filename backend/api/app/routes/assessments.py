@@ -274,6 +274,23 @@ def portfolio(db: Session = Depends(get_db),
     return sorted(out, key=lambda r: (r["composite"] is None, r["composite"]))
 
 
+def _stored_file(key: str, what: str):
+    """Resolve a storage key, treating an evicted file as 404 rather than a crash.
+
+    STORAGE_ROOT is /tmp on the free plan, so every deploy and every spin-down wipes the
+    uploads while the rows describing them survive in Postgres. A missing file is an
+    expected state here, not a server fault, and an uncaught FileNotFoundError surfaces
+    in the viewer as an opaque 500.
+    """
+    try:
+        return storage.get_path(key)
+    except FileNotFoundError:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"{what} is no longer stored — re-upload the DPR to restore it.",
+        ) from None
+
+
 @router.get("/documents/{document_id}/pages/{page_no}")
 def page_raster(document_id: uuid.UUID, page_no: int, db: Session = Depends(get_db),
                 user: User = Depends(current_user)):
@@ -285,7 +302,8 @@ def page_raster(document_id: uuid.UUID, page_no: int, db: Session = Depends(get_
         DocumentPage.document_id == document_id, DocumentPage.page_no == page_no))
     if page is None or not page.raster_key:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Page raster not available")
-    return FileResponse(storage.get_path(page.raster_key), media_type="image/webp")
+    return FileResponse(_stored_file(page.raster_key, "This page image"),
+                        media_type="image/webp")
 
 
 @router.get("/documents/{document_id}/pdf")
@@ -295,5 +313,5 @@ def source_pdf(document_id: uuid.UUID, db: Session = Depends(get_db),
     if doc is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found")
     _authorised(db, doc.dpr_id, user)
-    return FileResponse(storage.get_path(doc.storage_key), media_type="application/pdf",
-                        filename=doc.filename)
+    return FileResponse(_stored_file(doc.storage_key, "The source PDF"),
+                        media_type="application/pdf", filename=doc.filename)
