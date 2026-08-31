@@ -67,9 +67,10 @@ cd frontend && npm install && cp .env.example .env.local && cd ..
 | API health | http://localhost:8000/api/v1/health |
 | API docs | http://localhost:8000/docs |
 
-Demo logins are printed by the seed step. Three roles ship: an **applicant**, a **ministry
-officer** who can appraise but not sanction, and a **ministry user with `can_sanction`** —
-the split exists to prove the human gate is real.
+Demo logins are printed by the seed step. Two roles ship: an **applicant**, who submits and
+self-checks, and a **ministry** user, who appraises, ranks and sanctions. Appraisal and
+sanction stay two distinct acts writing two distinct audit events, even though one role
+performs both.
 
 Sample DPRs with planted defects are generated into `backend/samples/`.
 

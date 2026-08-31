@@ -11,13 +11,12 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from api.app.db import Base
-from api.app.models.base import Money, TimestampMixin, fk_uuid, pg_enum, uuid_pk
+from api.app.models.base import TimestampMixin, fk_uuid, pg_enum, uuid_pk
 
-__all__ = ["Assessment", "AssessmentCheck", "BenchmarkRate", "Finding", "FindingReview",
-           "Setting"]
+__all__ = ["Assessment", "AssessmentCheck", "Finding", "FindingReview", "Setting"]
 
 SEVERITY = pg_enum("critical", "high", "medium", "low", "info", name="finding_severity")
-CATEGORY = pg_enum("completeness", "consistency", "cost_realism", "financial",
+CATEGORY = pg_enum("completeness", "consistency", "financial",
                    "duplicate", "geo", "risk", "data_quality", name="finding_category")
 # Deliberately no 'fail'.
 FINDING_STATUS = pg_enum("pass", "partial", "insufficient_evidence", "flagged",
@@ -29,7 +28,8 @@ FINDING_STATUS = pg_enum("pass", "partial", "insufficient_evidence", "flagged",
 # The line between the last two members is worth stating, because getting it wrong makes
 # the checklist dishonest in a subtle way:
 #   not_run               — the engine cannot run this check for ANY document. A statement
-#                           about us. F5 is currently the only one.
+#                           about us. Nothing raises it today; the member stays so a future
+#                           blocked check can be reported honestly rather than as a zero.
 #   insufficient_evidence — the check ran, and THIS document did not give it what it
 #                           needed. A statement about the document.
 CHECK_STATUS = pg_enum("pass", "partial", "insufficient_evidence", "flagged", "not_run",
@@ -46,13 +46,12 @@ class Assessment(Base, TimestampMixin):
     overall_score: Mapped[float | None] = mapped_column(Float)
     completeness_score: Mapped[float | None] = mapped_column(Float)
     consistency_score: Mapped[float | None] = mapped_column(Float)
-    cost_realism_score: Mapped[float | None] = mapped_column(Float)
     financial_score: Mapped[float | None] = mapped_column(Float)
     rubric_version: Mapped[str | None] = mapped_column(String(60))
     engine_version: Mapped[str | None] = mapped_column(String(60))
     # Frozen at assessment time rather than re-derived from config/rubric.yaml on read.
     # Re-deriving would silently rewrite history the next time the rubric changes, and this
-    # record is what a sanctioning officer's decision was made against. The key is stored
+    # record is what the sanction decision was made against. The key is stored
     # alongside the label because tests and callers need to look the profile up, and
     # parsing it back out of `rubric_version` would be fragile.
     rubric_profile: Mapped[str | None] = mapped_column(String(60))
@@ -140,23 +139,6 @@ class FindingReview(Base, TimestampMixin):
     reviewer_id = fk_uuid("users.id")
     decision: Mapped[str] = mapped_column(REVIEW_DECISION, nullable=False)
     note: Mapped[str | None] = mapped_column(Text)
-
-
-class BenchmarkRate(Base, TimestampMixin):
-    """Reference rates for F5. Every row records its source — a rate we cannot attribute
-    is a rate we will not flag against. F5 is currently BLOCKED pending real SoR data."""
-    __tablename__ = "benchmark_rates"
-
-    id: Mapped[uuid.UUID] = uuid_pk()
-    item_code: Mapped[str | None] = mapped_column(String(60))
-    description: Mapped[str] = mapped_column(Text, nullable=False)
-    unit: Mapped[str] = mapped_column(String(40), nullable=False)
-    rate_paise: Mapped[int] = mapped_column(Money, nullable=False)
-    source: Mapped[str] = mapped_column(String(255), nullable=False)
-    source_url: Mapped[str | None] = mapped_column(Text)
-    source_year: Mapped[int | None] = mapped_column(Integer)
-    state: Mapped[str | None] = mapped_column(String(100))
-    cost_index: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
 
 
 class Setting(Base):

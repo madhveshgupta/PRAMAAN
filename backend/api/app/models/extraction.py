@@ -6,9 +6,8 @@ feature: "the AI tried to state a figure it could not evidence, and was blocked,
 this month."
 """
 import uuid
-from datetime import datetime
 
-from sqlalchemy import Float, Index, Integer, Numeric, String, Text
+from sqlalchemy import Float, Index, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 

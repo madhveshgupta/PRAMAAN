@@ -29,7 +29,7 @@ shortcut breaks the one thing that makes this project defensible.
 | 1 | Every extracted value and every finding has ≥1 evidence anchor. | The prime directive. |
 | 2 | LLM output is **never** trusted for a number. Always span-verified against parsed text. | Hallucinated budgets are disqualifying in a government tool. |
 | 3 | PDF parsing happens **only** in the background worker process, never in a request handler. | A 400-page PDF will time out any HTTP request. |
-| 4 | The system **never auto-rejects** a DPR. It scores and flags; a named human with `can_sanction` decides. No finding may have status `fail`. | Adoption and ethics. Stated on the UI. |
+| 4 | The system **never auto-rejects** a DPR. It scores and flags; a named ministry user decides, and the decision is written to the audit trail in their name. No finding may have status `fail`. | Adoption and ethics. Stated on the UI. |
 | 5 | All LLM calls go through `backend/api/app/llm/provider.py`. No direct SDK calls elsewhere. | Makes a move to an on-prem model a one-file change. |
 | 6 | Model predictions are always returned with SHAP attributions attached. | Explainability is an appraisal requirement, not a nice-to-have. |
 | 7 | Money is stored in **paise as BIGINT**, never float. Display converts to ₹ Cr/Lakh. | Float rupees in a financial tool is indefensible. |

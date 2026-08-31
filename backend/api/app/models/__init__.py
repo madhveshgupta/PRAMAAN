@@ -1,6 +1,6 @@
 """Import every model so Alembic's autogenerate and Base.metadata see them all."""
-from api.app.models.assessment import (Assessment, AssessmentCheck, BenchmarkRate,
-                                       Finding, FindingReview, Setting)
+from api.app.models.assessment import (Assessment, AssessmentCheck, Finding,
+                                       FindingReview, Setting)
 from api.app.models.document import (Document, DocumentPage, Dpr, Table, TableCell,
                                      TextSpan)
 from api.app.models.extraction import (DprExtraction, ExtractedField,
@@ -11,7 +11,7 @@ from api.app.models.job import Job
 from api.app.models.risk import OutcomeRange, ProjectEmbedding, RiskPrediction
 
 __all__ = [
-    "Assessment", "AssessmentCheck", "AuditEvent", "BenchmarkRate", "Document",
+    "Assessment", "AssessmentCheck", "AuditEvent", "Document",
     "DocumentPage", "Dpr",
     "DprExtraction", "ExtractedField", "ExtractionRejection", "Finding", "FindingReview",
     "Job", "Organisation", "OutcomeRange", "ProjectEmbedding", "RiskPrediction",

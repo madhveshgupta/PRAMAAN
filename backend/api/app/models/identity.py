@@ -1,8 +1,8 @@
 """Users and organisations.
 
-Two roles only: applicant and ministry. Separation of appraisal from sanction is the
-``can_sanction`` flag rather than a third role — a ministry that splits the two functions
-runs two users, one with the flag off. See docs/04_USER_ROLES_AND_JOURNEYS.md.
+Two roles only: applicant and ministry. Appraisal and sanction are two distinct acts
+recorded as two distinct audit events, but both are open to any ministry account — there
+is no per-user sanction flag. See docs/04_USER_ROLES_AND_JOURNEYS.md.
 """
 import uuid
 from datetime import datetime
@@ -38,8 +38,6 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(USER_ROLE, nullable=False)
-    # Gates the decision route. Enforced server-side, never by hiding a button.
-    can_sanction: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     organisation_id: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("organisations.id"), nullable=True, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
