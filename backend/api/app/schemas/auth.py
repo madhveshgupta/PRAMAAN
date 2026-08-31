@@ -11,7 +11,6 @@ class TokenPair(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     role: str
-    can_sanction: bool
     full_name: str
 
 

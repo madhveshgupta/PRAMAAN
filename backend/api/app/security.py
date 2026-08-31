@@ -1,8 +1,7 @@
-"""Password hashing, JWTs, and the role/permission dependencies.
+"""Password hashing, JWTs, and the role dependencies.
 
-Note what ``RequireSanction`` does and does not do. It rejects the *request*. Hiding the
-decision button in the UI is presentation; this is access control. Both exist, and only
-this one counts.
+Note what ``RequireRole`` does and does not do. It rejects the *request*. Hiding a control
+in the UI is presentation; this is access control. Both exist, and only this one counts.
 """
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -67,23 +66,22 @@ def verify_password(plain: str, hashed: str) -> bool:
         return False
 
 
-def _token(sub: str, role: str, can_sanction: bool, kind: str, delta: timedelta) -> str:
+def _token(sub: str, role: str, kind: str, delta: timedelta) -> str:
     s = get_settings()
     now = datetime.now(timezone.utc)
-    payload = {"sub": sub, "role": role, "can_sanction": can_sanction, "typ": kind,
-               "iat": now, "exp": now + delta}
+    payload = {"sub": sub, "role": role, "typ": kind, "iat": now, "exp": now + delta}
     return jwt.encode(payload, s.jwt_secret, algorithm=s.jwt_alg)
 
 
 def make_access_token(user: User) -> str:
     s = get_settings()
-    return _token(str(user.id), user.role, user.can_sanction, "access",
+    return _token(str(user.id), user.role, "access",
                   timedelta(minutes=s.access_token_minutes))
 
 
 def make_refresh_token(user: User) -> str:
     s = get_settings()
-    return _token(str(user.id), user.role, user.can_sanction, "refresh",
+    return _token(str(user.id), user.role, "refresh",
                   timedelta(days=s.refresh_token_days))
 
 
@@ -124,11 +122,3 @@ class RequireRole:
                                 f"Requires role: {', '.join(sorted(self.roles))}")
         return user
 
-
-def require_sanction(user: User = Depends(RequireRole("ministry"))) -> User:
-    """Gate the sanction decision. A ministry user without `can_sanction` may appraise and
-    recommend but not decide — the route refuses them, regardless of what the UI renders."""
-    if not user.can_sanction:
-        raise HTTPException(status.HTTP_403_FORBIDDEN,
-                            "This account may appraise and recommend but not sanction")
-    return user

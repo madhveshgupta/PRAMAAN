@@ -1,5 +1,5 @@
-"""Phase 1 exit gate: stack runs, both roles authenticate, the sanction gate bites,
-the audit trail is immutable, and the job queue claims/completes/reclaims correctly."""
+"""Phase 1 exit gate: stack runs, both roles authenticate, the role gate bites, the
+audit trail is immutable, and the job queue claims/completes/reclaims correctly."""
 import uuid
 from datetime import timedelta
 
@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 from api.app.models import AuditEvent, Job, User
 from api.app.models.base import utcnow
-from api.app.security import RequireRole, decode_token, require_sanction
+from api.app.security import RequireRole, decode_token
 from tests.conftest import login
 
 
@@ -25,7 +25,6 @@ def test_health_is_green(client):
 @pytest.mark.parametrize("email,role", [
     ("applicant@demo.gov.in", "applicant"),
     ("ministry@demo.gov.in", "ministry"),
-    ("officer@demo.gov.in", "ministry"),
 ])
 def test_each_seeded_user_logs_in_with_correct_role(client, email, role):
     body = login(client, email)
@@ -60,21 +59,13 @@ def test_refresh_token_cannot_be_used_as_an_access_token(client):
     assert r.status_code == 401
 
 
-# --------------------------------------------------- separation of duties
-def test_can_sanction_flag_is_carried_in_the_token(client):
-    assert login(client, "ministry@demo.gov.in")["can_sanction"] is True
-    assert login(client, "officer@demo.gov.in")["can_sanction"] is False
-
-
-def test_sanction_gate_refuses_the_appraise_only_ministry_user(db):
-    """The gate must reject the request, not merely hide a button."""
-    officer = db.query(User).filter_by(email="officer@demo.gov.in").one()
-    with pytest.raises(HTTPException) as exc:
-        require_sanction(officer)
-    assert exc.value.status_code == 403
-
-    js = db.query(User).filter_by(email="ministry@demo.gov.in").one()
-    assert require_sanction(js) is js
+# --------------------------------------------------------------- role gate
+def test_the_token_carries_no_permission_beyond_the_role(client):
+    """The role is the whole authorisation model. Anything else in the token would be a
+    permission the route did not check."""
+    body = login(client, "ministry@demo.gov.in")
+    assert "can_sanction" not in body
+    assert "can_sanction" not in decode_token(body["access_token"])
 
 
 def test_role_dependency_refuses_the_wrong_role(db):
@@ -82,6 +73,9 @@ def test_role_dependency_refuses_the_wrong_role(db):
     with pytest.raises(HTTPException) as exc:
         RequireRole("ministry")(applicant)
     assert exc.value.status_code == 403
+
+    js = db.query(User).filter_by(email="ministry@demo.gov.in").one()
+    assert RequireRole("ministry")(js) is js
 
 
 # ------------------------------------------------------- audit immutability

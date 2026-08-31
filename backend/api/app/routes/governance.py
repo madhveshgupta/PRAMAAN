@@ -2,10 +2,10 @@
 
 Two things here are load-bearing rather than decorative:
 
-* The sanction decision is gated on `can_sanction` **in the route**. A UI that hides the
-  button is presentation; this is access control.
+* Both steps are gated on the ministry role **in the route**. A UI that hides the button
+  is presentation; this is access control.
 * Appraisal and sanction are written as two distinct audit events, even when the same
-  officer performs both. Collapsing them would leave the trail unable to answer the only
+  person performs both. Collapsing them would leave the trail unable to answer the only
   question an auditor actually asks.
 """
 from __future__ import annotations
@@ -20,8 +20,7 @@ from sqlalchemy.orm import Session
 from api.app.db import get_db
 from api.app.models import (Assessment, AuditEvent, Dpr, Finding, FindingReview,
                             OutcomeRange, RiskPrediction, User)
-from api.app.security import (RequireRole, current_user, require_sanction,
-                              visible_dpr_or_404)
+from api.app.security import RequireRole, current_user, visible_dpr_or_404
 from api.app.services.report import build_appraisal_note
 
 router = APIRouter(tags=["governance"])
@@ -34,11 +33,12 @@ DECISIONS = {"approved": "approve", "returned": "return for revision",
 def write_recommendation(dpr_id: uuid.UUID, recommendation: str, note: str | None = None,
                          db: Session = Depends(get_db),
                          user: User = Depends(RequireRole("ministry"))) -> dict:
-    """The appraisal step. Available to any ministry user, including one who cannot
-    sanction — appraising and deciding are different acts."""
+    """The appraisal step. Available to any ministry user — appraising and deciding are
+    different acts, recorded as two distinct audit events."""
     if recommendation not in {"recommend", "recommend_with_conditions", "return"}:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid recommendation")
-    dpr = visible_dpr_or_404(db, dpr_id, user)
+    # Raises 404 for a report this user may not see; the row itself is not needed here.
+    visible_dpr_or_404(db, dpr_id, user)
 
     db.add(AuditEvent(actor_id=user.id, actor_role=user.role, dpr_id=dpr_id,
                       action="dpr.appraised",
@@ -50,8 +50,8 @@ def write_recommendation(dpr_id: uuid.UUID, recommendation: str, note: str | Non
 @router.post("/dprs/{dpr_id}/decision")
 def record_decision(dpr_id: uuid.UUID, decision: str, note: str,
                     db: Session = Depends(get_db),
-                    user: User = Depends(require_sanction)) -> dict:
-    """The sanction step. Gated on `can_sanction`; a note is always required."""
+                    user: User = Depends(RequireRole("ministry"))) -> dict:
+    """The sanction step. Ministry only; a note is always required."""
     if decision not in DECISIONS:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid decision")
     if not note.strip():
@@ -64,7 +64,7 @@ def record_decision(dpr_id: uuid.UUID, decision: str, note: str,
     dpr.status = "approved" if decision.startswith("approved") else decision
 
     # Pin what was true at the moment of decision — an audit years later must see what the
-    # officer saw, not what today's rubric would compute.
+    # deciding user saw, not what today's rubric would compute.
     db.add(AuditEvent(
         actor_id=user.id, actor_role=user.role, dpr_id=dpr_id, action="dpr.decided",
         detail={"decision": decision, "note": note,

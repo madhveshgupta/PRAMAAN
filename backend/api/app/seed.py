@@ -1,7 +1,7 @@
 """Seed demo users and reference data:  python -m api.app.seed
 
-Three users deliberately, not two. The third is a ministry account with can_sanction=False,
-so the separation-of-duties gate is exercised by the demo rather than merely described.
+Two users, one per role. The ministry account appraises and sanctions; the applicant
+submits and self-checks.
 """
 import sys
 from pathlib import Path
@@ -29,12 +29,9 @@ SECTORS = [
 ]
 
 USERS = [
-    ("applicant@demo.gov.in", "R. Sharma (Executive Engineer)", "applicant", False,
+    ("applicant@demo.gov.in", "R. Sharma (Executive Engineer)", "applicant",
      "Assam Public Works Department"),
-    ("ministry@demo.gov.in", "K. Nair (Joint Secretary)", "ministry", True,
-     "Ministry of Road Transport & Highways"),
-    # Appraises and recommends, cannot sanction. Proves the gate is real.
-    ("officer@demo.gov.in", "S. Bose (Desk Officer)", "ministry", False,
+    ("ministry@demo.gov.in", "K. Nair (Joint Secretary)", "ministry",
      "Ministry of Road Transport & Highways"),
 ]
 
@@ -58,10 +55,9 @@ def seed() -> int:
                 db.add(Sector(name=name, hml_category=hml))
                 created["sectors"] += 1
 
-        for email, full_name, role, can_sanction, org_name in USERS:
+        for email, full_name, role, org_name in USERS:
             if db.scalar(select(User).where(User.email == email)) is None:
                 db.add(User(email=email, full_name=full_name, role=role,
-                            can_sanction=can_sanction,
                             password_hash=hash_password(DEMO_PASSWORD),
                             organisation_id=org_by_name[org_name].id))
                 created["users"] += 1
@@ -81,9 +77,8 @@ def seed() -> int:
     print(f"seeded: {created['orgs']} orgs, {created['sectors']} sectors, "
           f"{created['users']} users, {created['settings']} settings")
     print(f"\ndemo logins (password: {DEMO_PASSWORD})")
-    for email, name, role, can_sanction, _ in USERS:
-        gate = "can sanction" if can_sanction else "APPRAISE ONLY - cannot sanction"
-        print(f"  {email:26} {role:10} {gate:32} {name}")
+    for email, name, role, _ in USERS:
+        print(f"  {email:26} {role:10} {name}")
     return 0
 
 

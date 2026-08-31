@@ -16,9 +16,6 @@ contradiction_tolerance_pct:
 duplicate_similarity_threshold:
   value: 0.85
   description: "Cosine similarity above which F10 flags a possible duplicate project."
-price_deviation_bands:
-  value: {info: 10, warning: 30}
-  description: "Percent deviation from benchmark rate mapping to severity. F5 is BLOCKED pending real SoR data."
 irr_tolerance_pp:
   value: 1.0
   description: "Percentage points between claimed and recomputed IRR before F6 flags."
@@ -26,5 +23,5 @@ low_confidence_threshold:
   value: 0.75
   description: "Extraction confidence below which a field is marked needs_human_verification."
 component_weights:
-  value: {completeness: 0.25, consistency: 0.25, cost_realism: 0.25, financial: 0.25}
-  description: "Overall quality score weighting. Even split is a placeholder — M3 and M4 to agree."
+  value: {completeness: 0.34, consistency: 0.33, financial: 0.33}
+  description: "Overall quality score weighting across the three scored components. Even split is a placeholder — M3 and M4 to agree."

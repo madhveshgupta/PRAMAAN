@@ -74,7 +74,6 @@ def _content_digest(dpr, assessment, findings, reviews, risk, outcome) -> str:
             "overall": assessment.overall_score,
             "completeness": assessment.completeness_score,
             "consistency": assessment.consistency_score,
-            "cost_realism": assessment.cost_realism_score,
             "financial": assessment.financial_score,
             "rubric_version": assessment.rubric_version,
             "engine_version": assessment.engine_version,
@@ -165,11 +164,10 @@ def build_appraisal_note(*, dpr, assessment, findings, reviews, risk, outcome,
         # Replace None with 0 for rendering
         c1 = assessment.completeness_score or 0
         c2 = assessment.consistency_score or 0
-        c3 = assessment.cost_realism_score or 0
-        c4 = assessment.financial_score or 0
-        
-        sc.data = [[c1, c2, c3, c4]]
-        sc.labels = ['Completeness', 'Consistency', 'Cost Realism', 'Financial']
+        c3 = assessment.financial_score or 0
+
+        sc.data = [[c1, c2, c3]]
+        sc.labels = ['Completeness', 'Consistency', 'Financial']
         sc.strands[0].fillColor = colors.Color(14/255.0, 165/255.0, 233/255.0, alpha=0.2)
         sc.strands[0].strokeColor = colors.HexColor("#0284c7")
         sc.strands[0].strokeWidth = 2
@@ -181,7 +179,6 @@ def build_appraisal_note(*, dpr, assessment, findings, reviews, risk, outcome,
             ("Overall", assessment.overall_score),
             ("Completeness", assessment.completeness_score),
             ("Consistency", assessment.consistency_score),
-            ("Cost realism", assessment.cost_realism_score),
             ("Financial sanity", assessment.financial_score),
         ]:
             rows.append([label, "not scored" if val is None else f"{val:.1f}"])
@@ -203,7 +200,7 @@ def build_appraisal_note(*, dpr, assessment, findings, reviews, risk, outcome,
         f.append(Spacer(1, 15))
 
     # ---- 3. Findings grouped by Severity
-    f.append(Paragraph(f"Detailed Findings", H2))
+    f.append(Paragraph("Detailed Findings", H2))
     if not findings:
         f.append(Paragraph("No findings were raised.", BODY))
     else:

@@ -1,9 +1,8 @@
 """Assembling the compliance checklist for the API.
 
-Kept out of the route handler for the usual reason: business logic belongs in a service. The one piece of real logic here is `cost_realism_reason`, which reads the
-blocked-check explanation back off the persisted row instead of the route repeating the
-literal — so the wording has one home, and an old assessment keeps the wording that was
-true when it ran.
+Kept out of the route handler for the usual reason: business logic belongs in a service.
+Each family's rows are read back in the order the engine wrote them, so an old assessment
+renders as it ran rather than as today's rubric would compute it.
 """
 from __future__ import annotations
 
@@ -13,13 +12,12 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from api.app.models import Assessment, AssessmentCheck, Finding
-from worker.scoring.checklist import COST_REALISM_UNAVAILABLE, FAMILY_ORDER
+from worker.scoring.checklist import FAMILY_ORDER
 
 FAMILY_LABEL: dict[str, str] = {
     "data_quality": "Document quality",
     "completeness": "Required sections",
     "consistency": "Cross-document consistency",
-    "cost_realism": "Cost realism",
     "financial": "Financial recomputation",
 }
 
@@ -61,15 +59,6 @@ def tally_many(db: Session,
     for aid, counts in out.items():
         counts["total"] = sum(counts[s] for s in STATUSES)
     return out
-
-
-def cost_realism_reason(db: Session, assessment_id: uuid.UUID) -> str:
-    """Why the cost-realism component has no score, taken from the check row itself."""
-    detail = db.scalar(
-        select(AssessmentCheck.detail)
-        .where(AssessmentCheck.assessment_id == assessment_id,
-               AssessmentCheck.family == "cost_realism"))
-    return detail or COST_REALISM_UNAVAILABLE
 
 
 def build(db: Session, a: Assessment) -> dict:

@@ -47,13 +47,8 @@ def get_assessment(dpr_id: uuid.UUID, db: Session = Depends(get_db),
         "components": [
             {"key": "completeness", "label": "Completeness", "score": a.completeness_score},
             {"key": "consistency", "label": "Consistency", "score": a.consistency_score},
-            # None means "not scored", never zero. F5 has no reference data, and scoring
-            # it zero would penalise the DPR for a gap that is ours.
-            {"key": "cost_realism", "label": "Cost realism", "score": a.cost_realism_score,
-             # Read off the persisted check row, so the wording has one home and an old
-             # assessment keeps the wording that was true when it ran.
-             "unavailable_reason": None if a.cost_realism_score is not None else
-             checklist_service.cost_realism_reason(db, a.id)},
+            # A score of None means "not scored", never zero — a component the engine could
+            # not compute must not read as a component the DPR failed.
             {"key": "financial", "label": "Financial sanity", "score": a.financial_score},
         ],
         "rubric_version": a.rubric_version,

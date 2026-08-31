@@ -15,8 +15,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def _pair(user: User) -> TokenPair:
     return TokenPair(access_token=make_access_token(user),
                      refresh_token=make_refresh_token(user),
-                     role=user.role, can_sanction=user.can_sanction,
-                     full_name=user.full_name)
+                     role=user.role, full_name=user.full_name)
 
 
 @router.post("/login", response_model=TokenPair)
@@ -45,5 +44,5 @@ def refresh(body: RefreshRequest, db: Session = Depends(get_db)) -> TokenPair:
 @router.get("/me")
 def me(user: User = Depends(current_user)) -> dict:
     return {"id": str(user.id), "email": user.email, "full_name": user.full_name,
-            "role": user.role, "can_sanction": user.can_sanction,
+            "role": user.role,
             "organisation_id": str(user.organisation_id) if user.organisation_id else None}
