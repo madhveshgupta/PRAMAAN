@@ -1,0 +1,64 @@
+# Render blueprint for the PRAMAAN backend — FREE-TIER variant.
+# frontend/ deploys separately on Vercel (see frontend/README.md).
+#
+# The API and the job worker run as two processes on ONE service. That is deliberate:
+# both read and write the same storage/ tree (uploaded PDFs, page rasters), so they must
+# see the same filesystem. Splitting them silently gives the worker its own empty tree,
+# and every highlight 404s.
+#
+# WHAT THE FREE PLAN COSTS YOU, versus the paid setup this replaces:
+#   1. No disk. STORAGE_ROOT points at /tmp, so every uploaded PDF and page raster is
+#      erased on each deploy and each spin-down. Documents survive in Postgres; their
+#      files do not, so re-upload before a demo.
+#   2. The service sleeps after ~15 min with no inbound request, and the worker sleeps
+#      with it — a queued job sits untouched until the next HTTP call wakes the container
+#      (~1 min cold start). Ping /api/v1/health from an external cron to stay warm.
+#   3. 512 MB RAM for both processes. Measured import-time baseline is ~270 MB combined,
+#      so a large PDF rastering in the worker can OOM. MAX_UPLOAD_MB is lowered to match.
+#   4. The database is DELETED 30 days after creation (14 days' grace to upgrade first),
+#      caps at 1 GB, and only one may be active per workspace. Fine for a short-lived
+#      demo; migrate to a paid plan or an external host before relying on it.
+#
+# Restore the paid setup by putting back `plan: starter`, the `disk:` block (10 GB at
+# /var/data), and STORAGE_ROOT=/var/data/storage.
+services:
+  - type: web
+    name: pramaan-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: ./scripts/start.sh
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.6
+      # Render hands this over as postgresql://…, which SQLAlchemy would read as psycopg2
+      # — a driver this project does not install. Settings.sqlalchemy_url rewrites the
+      # scheme to +psycopg on the way to create_engine, so the raw value is fine here.
+      - key: DATABASE_URL
+        fromDatabase: { name: pramaan-db, property: connectionString }
+      - key: STORAGE_ROOT
+        value: /tmp/pramaan-storage    # ephemeral; free instances get no disk
+      - key: MAX_UPLOAD_MB
+        value: "25"                    # 512 MB of RAM will not raster a 100 MB DPR
+      - key: JWT_SECRET
+        generateValue: true
+      # Dead config on the current split deploy and kept only as defence in depth: every
+      # frontend call is a relative /api/v1 path that Next rewrites server-side, so the
+      # browser is same-origin with Vercel and never sends this API an Origin header.
+      # It matters the moment anything calls this host directly — /docs, curl, a future
+      # client that skips the proxy.
+      - key: CORS_ORIGINS
+        value: https://sih-final-sigma.vercel.app
+      - key: GEMINI_API_KEY
+        sync: false                    # blank is fine if DEMO_MODE is "true"
+      - key: DEMO_MODE
+        value: "false"
+
+databases:
+  - name: pramaan-db
+    databaseName: pramaan
+    user: pramaan
+    plan: free                         # 0.1 CPU / 256 MB / 1 GB storage / 100 connections
+    postgresMajorVersion: "16"
