@@ -155,11 +155,6 @@ export function ComponentBars({ components, onPick }: {
                 )}
               </div>
             </Row>
-            {missing && c.unavailable_reason && (
-              <p className="mt-1.5 text-2xs text-ink-faint leading-snug">
-                {c.unavailable_reason}
-              </p>
-            )}
           </li>
         );
       })}
