@@ -82,8 +82,10 @@ export default function DataSources() {
                 them, which is worse than reporting nothing.
               </p>
               <p>
-                It appears in every assessment as a check marked <b className="rounded-md bg-paper-deep px-1.5 py-0.5 text-xs font-semibold text-ink">not run</b>, with that
-                reason given, rather than as a score that is quietly missing.
+                So it is absent from the score rather than sitting inside it as a component
+                that could never be filled in. The quality score is made up only of what
+                PRAMAAN can evidence from the document in front of it — nothing in it is a
+                placeholder.
               </p>
             </div>
           </section>

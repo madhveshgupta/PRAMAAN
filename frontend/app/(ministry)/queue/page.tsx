@@ -160,7 +160,9 @@ export default function QueuePage() {
     <AppShell title="Review queue"
               subtitle="Reports waiting on an appraisal decision, most urgent first."
               notices={notices} rail={rail}>
-      <div className="flex flex-wrap items-center gap-3">
+      <StatStrip stats={stats} />
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <Segmented<Tab>
           label="Filter the queue"
           value={tab} onChange={setTab}
@@ -220,10 +222,6 @@ export default function QueuePage() {
             <DprTable rows={shown} hrefBase="/review" loading={false} />
           </div>
         )}
-      </div>
-
-      <div className="mt-6">
-        <StatStrip stats={stats} />
       </div>
     </AppShell>
   );

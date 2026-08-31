@@ -14,7 +14,6 @@ import { useAuth } from "@/lib/auth";
 
 const DEMO = [
   ["ministry@demo.gov.in", "Ministry", "reviews, ranks and sanctions"],
-  ["officer@demo.gov.in", "Ministry", "reviews and recommends — cannot sanction"],
   ["applicant@demo.gov.in", "Applicant", "submits and self-checks"],
 ];
 
@@ -93,7 +92,7 @@ export function LoginCard({ demo = false, autoFocus = false }: {
       <div className="border-t border-paper-edge bg-paper-soft px-7 py-5">
         <p className="text-xs font-semibold text-ink text-center">Demonstration accounts</p>
         <p className="text-2xs text-ink-faint mt-0.5 text-center">
-          Password for all three: <code className="font-mono">pramaan</code>
+          Password for both: <code className="font-mono">pramaan</code>
         </p>
         <ul className="mt-3 space-y-2">
           {DEMO.map(([mail, role, note]) => (

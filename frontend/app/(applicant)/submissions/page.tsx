@@ -114,7 +114,7 @@ function Submissions() {
         </button>
       </RailCard>
 
-      {/* No "Summary" card here. It listed the same four figures as the band at the foot
+      {/* No "Summary" card here. It listed the same four figures as the band at the head
           of the page, in the same order, six inches apart — and a number shown twice on one
           screen is a number a reader has to check against itself. The band keeps them,
           because it is the one an eye lands on first. */}
@@ -172,7 +172,9 @@ function Submissions() {
               }>
       <UploadDialog open={uploading} onClose={closeUpload} onDone={refresh} />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <StatStrip stats={stats} />
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <Segmented<Tab>
           label="Filter reports"
           value={tab} onChange={setTab}
@@ -232,10 +234,6 @@ function Submissions() {
             </div>
           </>
         )}
-      </div>
-
-      <div className="mt-6">
-        <StatStrip stats={stats} />
       </div>
 
       <p className="mt-4 max-w-3xl text-2xs leading-relaxed text-ink-faint">

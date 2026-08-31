@@ -299,7 +299,7 @@ function FamilyBlock({ fam, activeKey, onOpen }: {
   );
 }
 
-export function ChecklistView({ checklist, onOpen, activeKey, ministry }: ViewProps & {
+export function ChecklistView({ checklist, onOpen, activeKey }: ViewProps & {
   checklist: Checklist | null;
 }) {
   const [only, setOnly] = useState<string | null>(null);
@@ -308,13 +308,12 @@ export function ChecklistView({ checklist, onOpen, activeKey, ministry }: ViewPr
   const families = useMemo(() => {
     if (!checklist) return [];
     return checklist.families
-      .filter((f) => ministry || f.key !== "cost_realism")
       .map((f) => ({
         ...f,
         visible: only ? f.checks.filter((c) => c.status === only) : f.checks,
       }))
       .filter((f) => f.visible.length > 0);
-  }, [checklist, only, ministry]);
+  }, [checklist, only]);
 
   if (!checklist) {
     return <Empty title="No checklist yet"

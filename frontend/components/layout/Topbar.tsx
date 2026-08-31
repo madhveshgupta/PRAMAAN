@@ -145,17 +145,6 @@ function AccountMenu() {
             <p className="mt-0.5 text-2xs text-ink-faint">
               {session.role === "applicant" ? "Submitting organisation" : "Appraisal officer"}
             </p>
-            {/* The single most consequential fact about a MINISTRY account, stated where
-                the account is rather than buried in a tooltip on a disabled button. It says
-                nothing about an applicant, who never had sanctioning power to be told they
-                lack — and "May recommend, not sanction" on a submitter's own menu reads as
-                a permission they were refused. */}
-            {session.role === "ministry" && (
-              <p className={`mt-2 chip ${session.can_sanction
-                ? "bg-ok-soft text-ok border-ok/25" : "bg-paper-deep text-ink-soft border-paper-edge"}`}>
-                {session.can_sanction ? "✓ May record a sanction" : "⊘ May recommend, not sanction"}
-              </p>
-            )}
           </div>
           {/* The ministry's record of its own decision. An applicant has no appraisal to
               read, so offering them the shelf is offering a door that opens on nothing. */}
