@@ -274,11 +274,6 @@ export function SiteHeader({ variant = "app" }: { variant?: "app" | "public" }) 
                   <p className="text-white/95">{session.full_name}</p>
                   <p className="text-2xs text-white/55">
                     {session.role === "applicant" ? "Applicant" : "Ministry"}
-                    {session.role === "ministry" && !session.can_sanction && (
-                      <span title="This account can review and recommend, but cannot approve">
-                        {" "}· review only
-                      </span>
-                    )}
                   </p>
                 </div>
                 <button onClick={signOut}

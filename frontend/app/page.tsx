@@ -117,8 +117,9 @@ const FAQ: [string, React.ReactNode][] = [
   ["Does PRAMAAN approve or reject a project?",
    <>No, and it is built so that it cannot. It scores, flags problems and shows the evidence
     behind them. The decision belongs to a named officer who holds that authority. This is
-    enforced by the system, not just promised: a ministry account without approval rights can
-    recommend and nothing more.</>],
+    enforced by the system, not just promised: no finding can carry a status of “fail”, and
+    a recommendation and a sanction are written to the audit trail as two separate acts,
+    each naming the person who made it.</>],
   ["Where do the risk numbers come from?",
    <>From MoSPI PAIMANA flash reports — the government’s own records of every central
     project of ₹150 crore and above, comparing the approved cost with the revised cost and
@@ -132,8 +133,8 @@ const FAQ: [string, React.ReactNode][] = [
   ["What does PRAMAAN deliberately not check?",
    <>Unit rates against a Schedule of Rates (the official price list for construction work).
     No published version of that list was available, and comparing against invented rates
-    would produce confident findings with nothing behind them. So it appears in every
-    assessment as a check marked <b>not run</b>, with that reason given.</>],
+    would produce confident findings with nothing behind them — so the check is designed but
+    not built, and the score is made up only of the components it can actually evidence.</>],
   ["Are the sample reports real DPRs?",
    <>No, and they say so. To test whether PRAMAAN catches a problem, you have to know the
     problem is there — so the samples have known faults built into them. What is not invented
@@ -447,8 +448,8 @@ export default function Landing() {
           <GradientOrbs variant="dark" />
           <div className="relative z-10 mx-auto max-w-screen px-5 py-20">
             <Heading inverted eyebrow="What it checks" title="Six things, done properly">
-              Each one either gives you evidence you can open, or it does not run and tells
-              you why.
+              Each one gives you evidence you can open — or it says plainly that the document
+              did not give it enough to go on.
             </Heading>
 
             <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

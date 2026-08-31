@@ -40,12 +40,6 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     why: "An arithmetic error in an abstract of cost is carried forward into every downstream figure, including the one that is sanctioned.",
     actor: "applicant",
   },
-  cost_realism: {
-    label: "Cost realism",
-    what: "Whether the proposed cost sits within the range comparable completed projects actually landed in.",
-    why: "A proposal well below the observed range is the strongest single predictor of a later revision. It is not evidence of an error in the report — it is a question worth asking before sanction.",
-    actor: "ministry",
-  },
   duplicate: {
     label: "Possible duplication",
     what: "Whether this proposal overlaps a project already sanctioned or already in the pipeline.",

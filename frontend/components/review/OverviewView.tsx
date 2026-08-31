@@ -114,13 +114,8 @@ export function OverviewView({
               project is worth funding. Advisory: nothing here decides anything.
             </p>
             <div className="mt-5">
-              {/* Cost realism is filtered out for the applicant because it never runs: it is
-                  our note about a gap in our own coverage, not something its author can act
-                  on. */}
-              <ComponentBars
-                components={assessment.components.filter(
-                  (c) => ministry || c.key !== "cost_realism")}
-                onPick={() => onGoto("checklist")} />
+              <ComponentBars components={assessment.components}
+                             onPick={() => onGoto("checklist")} />
             </div>
           </div>
         </div>

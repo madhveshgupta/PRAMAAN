@@ -179,7 +179,7 @@ export function DecisionPanel({ dprId, session, assessment, decision, onDone }: 
            <div>
               <h3 className="text-[18px] font-bold text-slate-800 mt-1">Appraisal recommendation</h3>
               <p className="mt-1 text-[13px] text-slate-500 leading-relaxed">
-                Your professional view on the report. Any ministry officer may record this, including one who cannot sanction.
+                Your professional view on the report, recorded separately from the sanction below — appraising and deciding are different acts.
               </p>
            </div>
         </div>
@@ -202,7 +202,7 @@ export function DecisionPanel({ dprId, session, assessment, decision, onDone }: 
       </section>
 
       {/* 2 — sanction */}
-      <section className={`bg-white rounded-[24px] shadow-sm border border-slate-200 p-6 sm:p-8 relative overflow-hidden ${session.can_sanction ? "" : "opacity-80"}`}>
+      <section className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6 sm:p-8 relative overflow-hidden">
         <div className="flex items-start gap-4">
            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
              <span className="text-indigo-500 font-black text-xl">2</span>
@@ -216,23 +216,14 @@ export function DecisionPanel({ dprId, session, assessment, decision, onDone }: 
         </div>
 
         <div className="mt-6 pl-0 sm:pl-16">
-          {!session.can_sanction && (
-            <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 text-amber-800 shadow-sm">
-              <Icon name="shield" className="w-5 h-5 shrink-0 text-amber-500" />
-              <p className="text-[13px] leading-relaxed">
-                <b>Cannot sanction:</b> This account may appraise and recommend but not sanction. The separation is held by the server — the controls below would be refused even if they were enabled.
-              </p>
-            </div>
-          )}
-
           <textarea value={decNote} onChange={(e) => setDecNote(e.target.value)}
-                    rows={3} required disabled={!session.can_sanction}
+                    rows={3} required
                     placeholder="Recorded reason (required)"
-                    className="w-full rounded-xl border border-slate-300 p-4 text-[14px] text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm resize-y disabled:bg-slate-50 disabled:text-slate-400 disabled:border-slate-200" />
+                    className="w-full rounded-xl border border-slate-300 p-4 text-[14px] text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm resize-y" />
           <div className="mt-4 flex flex-wrap gap-3">
             {DECISIONS.map(([value, label]) => (
               <button key={value}
-                      disabled={!session.can_sanction || !decNote.trim() || busy !== null}
+                      disabled={!decNote.trim() || busy !== null}
                       onClick={() => setPending({ value, label })}
                       className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all shadow-sm disabled:opacity-50 ${value === "rejected"
                         ? "bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300"

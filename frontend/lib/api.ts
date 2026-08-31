@@ -12,7 +12,6 @@ export interface Session {
   access_token: string;
   refresh_token: string;
   role: Role;
-  can_sanction: boolean;
   full_name: string;
 }
 
@@ -143,8 +142,8 @@ export interface DecisionPayload {
 export interface Component {
   key: string;
   label: string;
+  /** null means the engine could not compute it — never zero. */
   score: number | null;
-  unavailable_reason: string | null;
 }
 
 export interface Assessment {
