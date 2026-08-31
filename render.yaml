@@ -56,8 +56,12 @@ services:
       # browser is same-origin with Vercel and never sends this API an Origin header.
       # It matters the moment anything calls this host directly — /docs, curl, a future
       # client that skips the proxy.
+      # Comma-separated. Two entries on purpose: the first is the project's stable alias
+      # and survives every redeploy; the second is a build-specific deployment URL, which
+      # Vercel regenerates on each push — pinning only that one would break CORS the next
+      # time anything deploys.
       - key: CORS_ORIGINS
-        value: https://sih-final-sigma.vercel.app
+        value: https://pramaan-madhveshgupta11-4146s-projects.vercel.app,https://pramaan-ay9s4bkm8-madhveshgupta11-4146s-projects.vercel.app
       - key: GEMINI_API_KEY
         sync: false                    # blank is fine if DEMO_MODE is "true"
       - key: DEMO_MODE
