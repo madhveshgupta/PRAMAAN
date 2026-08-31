@@ -115,7 +115,6 @@ def _metrics(y_true, y_prob, y_pred) -> dict:
 
 def train_target(d: pd.DataFrame, target: str, label: str) -> dict:
     import lightgbm as lgb
-    from sklearn.metrics import brier_score_loss, roc_auc_score
 
     d = d.dropna(subset=[target])
     train, test, cut = time_split(d)

@@ -1,7 +1,7 @@
 """Phase 9 exit gate — governance, reporting and offline safety.
 
-The separation-of-duties tests matter most. A UI that hides the sanction button is
-presentation; these assert the route itself refuses.
+The access-control tests matter most. A UI that hides the sanction button is presentation;
+these assert the route itself refuses.
 """
 import uuid
 
@@ -30,25 +30,25 @@ def _auth(client, email):
     return {"Authorization": f"Bearer {login(client, email)['access_token']}"}
 
 
-# --------------------------------------------------- separation of duties
-def test_appraise_only_officer_may_recommend(client, dpr_id):
+# --------------------------------------------------- access control
+def test_ministry_may_record_an_appraisal(client, dpr_id):
+    """Appraisal and sanction stay two distinct acts even though one role performs both."""
     r = client.post(f"/api/v1/dprs/{dpr_id}/recommendation",
                     params={"recommendation": "recommend_with_conditions",
                             "note": "IRR needs reconciliation"},
-                    headers=_auth(client, "officer@demo.gov.in"))
+                    headers=_auth(client, "ministry@demo.gov.in"))
     assert r.status_code == 200
 
 
-def test_appraise_only_officer_cannot_sanction(client, dpr_id):
+def test_applicant_cannot_record_an_appraisal(client, dpr_id):
     """The route refuses. Hiding the button is not access control."""
-    r = client.post(f"/api/v1/dprs/{dpr_id}/decision",
-                    params={"decision": "approved", "note": "looks fine"},
-                    headers=_auth(client, "officer@demo.gov.in"))
+    r = client.post(f"/api/v1/dprs/{dpr_id}/recommendation",
+                    params={"recommendation": "recommend", "note": "x"},
+                    headers=_auth(client, "applicant@demo.gov.in"))
     assert r.status_code == 403
-    assert "sanction" in r.json()["detail"].lower()
 
 
-def test_ministry_with_the_flag_can_sanction(client, dpr_id):
+def test_ministry_can_sanction(client, dpr_id):
     r = client.post(f"/api/v1/dprs/{dpr_id}/decision",
                     params={"decision": "returned",
                             "note": "Reconcile the cost abstract and resubmit"},

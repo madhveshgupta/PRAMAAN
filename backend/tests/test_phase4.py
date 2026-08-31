@@ -98,14 +98,6 @@ def test_negation_downgrades_environmental_clearance(db, bridge):
     assert "negation" in hits[0].message.lower()
 
 
-def test_cost_realism_is_reported_as_blocked_not_scored_as_zero(db, bridge):
-    """F5 has no Schedule of Rates data. Scoring it zero would punish the DPR for our
-    missing reference data; scoring it 100 would be a lie. It is left unscored."""
-    a = db.scalar(select(Assessment).where(Assessment.dpr_id == bridge.id))
-    assert a.cost_realism_score is None
-    assert not _findings(db, bridge, "F5-")
-
-
 # --------------------------------------------------------------- the control case
 def test_clean_dpr_scores_well_above_the_defective_one(db, bridge, control):
     a = db.scalar(select(Assessment).where(Assessment.dpr_id == bridge.id))
@@ -319,12 +311,10 @@ def test_the_irr_pass_row_shows_both_the_claim_and_the_table(db, control):
     assert len({e["page"] for e in c.evidence}) == 2, "claim and cash-flow table"
 
 
-def test_cost_realism_says_not_run_and_gives_the_reason(db, control):
-    """`not_run` is reserved for a check the engine cannot run for ANY document. It must
-    never read as though this DPR were at fault."""
-    rows = _checks(db, control, "cost_realism")
-    assert len(rows) == 1 and rows[0].status == "not_run"
-    assert "Schedule of Rates" in rows[0].detail
+def test_no_check_claims_a_family_the_engine_no_longer_scores(db, control):
+    """Cost realism was removed: it could never be scored, so it was a permanent apology in
+    the middle of the checklist. No row may still claim that family."""
+    assert not _checks(db, control, "cost_realism")
 
 
 def test_no_check_anywhere_has_status_fail(db):

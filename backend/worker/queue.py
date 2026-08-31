@@ -18,7 +18,6 @@ from __future__ import annotations
 import logging
 import os
 import socket
-import uuid
 from datetime import timedelta
 
 from sqlalchemy import text

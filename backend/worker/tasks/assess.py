@@ -10,7 +10,6 @@ be defensible rule by rule, and rules are.
 """
 from __future__ import annotations
 
-import json
 import logging
 
 from sqlalchemy import delete, select
@@ -60,8 +59,7 @@ def handle_assess(db: Session, job: Job) -> None:
     strong = float(_setting(db, "evidence_strong_threshold", 0.75))
     tolerance = float(_setting(db, "contradiction_tolerance_pct", 0.5))
     weights = _setting(db, "component_weights",
-                       {"completeness": .25, "consistency": .25,
-                        "cost_realism": .25, "financial": .25})
+                       {"completeness": 1 / 3, "consistency": 1 / 3, "financial": 1 / 3})
 
     assessment = Assessment(dpr_id=dpr_id,
                             rubric_version=completeness.load_rubric()["version"],
@@ -154,14 +152,7 @@ def handle_assess(db: Session, job: Job) -> None:
             evidence=[e.to_dict() for _v, e in c.values]), "F4-COST-AGREEMENT"))
     cons_score = 100.0 if not cons_findings else max(0.0, 100.0 - 35.0 * len(cons_findings))
 
-    # ---- 4c cost realism — BLOCKED ---------------------------------------------------
-    # F5 needs published Schedule of Rates data that has not been obtained. We do not
-    # ship invented benchmark rates, so the component is reported as unavailable rather
-    # than scored on nothing. See IMPLEMENTATION-FINAL/M4_FINAL.md §1.
-    cost_score = None
-    checks += checklist.cost_realism_checks()
-
-    # ---- 4d financial ----------------------------------------------------------------
+    # ---- 4c financial ----------------------------------------------------------------
     fin = financial.recompute(db, doc.id)
     fin_score = 100.0
     # Hoisted out of the branch chain below: all three financial checklist rows cite the
@@ -233,15 +224,14 @@ def handle_assess(db: Session, job: Job) -> None:
 
     # ---- aggregate -------------------------------------------------------------------
     parts = {"completeness": comp_score, "consistency": cons_score, "financial": fin_score}
-    if cost_score is not None:
-        parts["cost_realism"] = cost_score
     live = {k: v for k, v in parts.items() if v is not None}
-    total_w = sum(weights.get(k, 0.25) for k in live)
-    overall = sum(v * weights.get(k, 0.25) for k, v in live.items()) / total_w if total_w else 0.0
+    default_w = 1 / 3
+    total_w = sum(weights.get(k, default_w) for k in live)
+    overall = (sum(v * weights.get(k, default_w) for k, v in live.items()) / total_w
+               if total_w else 0.0)
 
     assessment.completeness_score = comp_score
     assessment.consistency_score = cons_score
-    assessment.cost_realism_score = cost_score
     assessment.financial_score = round(fin_score, 1)
     if tmpl.is_template:
         # Structure without content is not quality. Cap the headline score so a blank
@@ -262,6 +252,5 @@ def handle_assess(db: Session, job: Job) -> None:
     db.commit()
 
     log.info("assessed dpr %s: overall %.1f (completeness %.1f, consistency %.1f, "
-             "financial %.1f, cost_realism %s) — %s findings",
-             dpr_id, overall, comp_score, cons_score, fin_score,
-             "BLOCKED" if cost_score is None else cost_score, len(kept))
+             "financial %.1f) — %s findings",
+             dpr_id, overall, comp_score, cons_score, fin_score, len(kept))

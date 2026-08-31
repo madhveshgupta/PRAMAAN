@@ -37,13 +37,7 @@ log = logging.getLogger("pramaan.checklist")
 # unfilled-template check: if the form is not filled in, every other row is about the shape
 # of the document rather than its content.
 FAMILY_ORDER: tuple[str, ...] = ("data_quality", "completeness", "consistency",
-                                 "cost_realism", "financial")
-
-# The single source of truth for why F5 does not run. `api/app/routes/assessments.py` reads
-# it back off the persisted row rather than repeating the literal.
-COST_REALISM_UNAVAILABLE = (
-    "Requires published Schedule of Rates data, which has not been obtained. "
-    "We do not benchmark against invented rates.")
+                                 "financial")
 
 
 @dataclass
@@ -139,15 +133,6 @@ def consistency_checks(r: ConsistencyReport) -> list[Check]:
                       evidence=_anchors(r.anchors))]
     return [Check("consistency", "F4-COST-AGREEMENT", label, "high", "pass",
                   format_agreement(r), evidence=_anchors(r.anchors))]
-
-
-# ─────────────────────────────────────────────────────────────── cost realism (blocked)
-def cost_realism_checks() -> list[Check]:
-    """The most important row in the checklist for trust: the system stating plainly what
-    it does NOT check, and why."""
-    return [Check("cost_realism", "F5-COST-REALISM",
-                  "Unit rates benchmarked against a published Schedule of Rates",
-                  "high", "not_run", COST_REALISM_UNAVAILABLE)]
 
 
 # ─────────────────────────────────────────────────────────────── financial

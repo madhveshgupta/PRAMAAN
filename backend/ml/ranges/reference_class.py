@@ -16,7 +16,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 PANEL = Path("ml/data/paimana_panel.csv")
