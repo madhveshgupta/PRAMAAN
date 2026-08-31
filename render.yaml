@@ -25,6 +25,13 @@ services:
   - type: web
     name: pramaan-api
     runtime: python
+    # Pinned explicitly. A service created against the old SIH-FINAL repo keeps that
+    # binding even once the blueprint moves, and SIH-FINAL has no `main` — the sync then
+    # fails with "git branch not found" while the blueprint itself looks correct. Naming
+    # the repo here makes a fresh blueprint bind to the right place; an already-bound
+    # service still has to be repointed in the dashboard.
+    repo: https://github.com/madhveshgupta/PRAMAAN
+    branch: main
     rootDir: backend
     plan: free
     buildCommand: pip install -r requirements.txt

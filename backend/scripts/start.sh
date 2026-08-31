@@ -14,7 +14,7 @@ alembic upgrade head
 # Render's free plan gives no shell to run it by hand once, and a wiped-and-recreated free
 # database would otherwise come back with an empty users table and no way to log in.
 #
-# It creates three known accounts with a published password (see seed.DEMO_PASSWORD).
+# It creates two known accounts with a published password (see seed.DEMO_PASSWORD).
 # Set SEED_DEMO_USERS=0 before this stops being a demo.
 if [ "${SEED_DEMO_USERS:-1}" != "0" ]; then
   python -m api.app.seed
